@@ -16,11 +16,13 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 , function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http) {
   $scope.sensorDropClass
   $scope.sensorLoadingMessage = ''
+  $scope.timelineDropClass
   $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA'
 
 
   // File loading interactions
+  // Sensor
   $scope.loadSensorFile = function(){
     document.querySelector('input#hidden-sensor-file-input').click()
   }
@@ -85,8 +87,74 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     $scope.$apply()
   }
 
+    // Timeline
+  $scope.loadTimelineFile = function(){
+    document.querySelector('input#hidden-timeline-file-input').click()
+  }
+
+  $scope.setTimelineFile = function(element) {
+    var file = element.files[0]
+    $scope.readTimelineFile(file)
+  }
+
+  $scope.readTimelineFile = function(file){
+    var fileLoader = new FileLoader()
+    fileLoader.read(file, {
+      onloadstart: function(evt){
+        $scope.timelineLoadingMessage = 'UPLOADING...'
+        $scope.timelineDropClass = 'loading'
+        $scope.$apply()
+      }
+      ,onprogress: function(evt){
+        // evt is a ProgressEvent
+        if (evt.lengthComputable) {
+          $scope.timelineLoadingMessage = 'UPLOADING ' + Math.round((evt.loaded / evt.total) * 100) + '%'
+          $scope.$apply()
+        }
+      }
+      ,onload: function(evt){
+        var target = evt.target || evt.srcElement
+
+        if (target.result) {
+          var g;
+
+          try {
+            // TODO: THE PROPER PARSING
+            g = gexf.parse(graphology.Graph, target.result);
+          } catch(e) {
+            timelineParsingFail()
+          }
+
+          if(g) {
+            store.set('graph', g)
+            timelineParsingSuccess()
+          } else {
+            timelineParsingFail()
+          }
+        } else {
+          timelineParsingFail()
+        }
+      }
+    })
+  }
+
+  function timelineParsingSuccess() {
+    $scope.timelineLoadingMessage = 'PARSED'
+    $scope.timelineDropClass = 'success'
+    $scope.$apply()
+    $timeout(function(){
+      $location.url('/board')
+    }, 250)
+  }
+  function timelineParsingFail() {
+    $scope.timelineLoadingMessage = 'CANNOT PARSE'
+    $scope.timelineDropClass = 'error'
+    $scope.$apply()
+  }
+
   // Make the text area droppable
   droppable(document.getElementById("sensor-uploader"), 'sensorDropClass', $scope, $scope.readSensorFile)
+  droppable(document.getElementById("timeline-uploader"), 'timelineDropClass', $scope, $scope.readTimelineFile)
 }])
 
 .factory('FileLoader', ['$window', function(win){
