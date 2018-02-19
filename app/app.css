@@ -11,11 +11,11 @@
   font-family: 'Raleway', sans-serif;
   font-size: 1.2em;
   color: #534b45;
-  background-color: #EDE9E2;
+  background-color: #d3d1c4;
 }
 
 .fancy-text .main-title {
-  font-family: 'Lobster', cursive;
+  font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: 2.6em;
   margin-top: 0;
@@ -77,10 +77,10 @@ h3.script-title {
   background-color: #7595af;
 }
 .upload-background.color-sensor {
-  background-color: #665183;
+  background-color: #8f859e;
 }
 .upload-background.color-timeline {
-  background-color: #7588af;
+  background-color: #6d7994;
 }
 .upload-area-container{
   user-select: none;

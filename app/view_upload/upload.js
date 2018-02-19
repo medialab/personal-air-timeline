@@ -16,7 +16,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 , function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http) {
   $scope.dropClass
   $scope.loadingMessage = ''
-  $scope.uploadStatusMessage = 'PLEASE UPLOAD DATA'
+  $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA'
 
 
   // File loading interactions
