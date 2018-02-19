@@ -20,6 +20,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA'
 
+  store.set('timelines', [])
 
   // File loading interactions
   // Sensor
@@ -51,17 +52,16 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         var target = evt.target || evt.srcElement
 
         if (target.result) {
-          var g;
+          var data;
 
           try {
-            // TODO: THE PROPER PARSING
-            g = gexf.parse(graphology.Graph, target.result);
+            data = parseSensor(target.result);
           } catch(e) {
             sensorParsingFail()
           }
 
-          if(g) {
-            store.set('graph', g)
+          if(data) {
+            store.set('sensor', data)
             sensorParsingSuccess()
           } else {
             sensorParsingFail()
@@ -155,6 +155,42 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   // Make the text area droppable
   droppable(document.getElementById("sensor-uploader"), 'sensorDropClass', $scope, $scope.readSensorFile)
   droppable(document.getElementById("timeline-uploader"), 'timelineDropClass', $scope, $scope.readTimelineFile)
+
+  // Parsing functions
+  function parseSensor(csv) {
+    // Columns are: "Date", " Time", " T", " RH", " P", " PM2.5", " PM10"
+    var data = d3.csvParseRows(csv)
+      .map(function(row){return row.map(function(d){ return d.trim() })})
+      .filter(function(row, i){
+        if (
+          row.length == 7
+          && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(row[0])
+          && /^\d{1,2}:\d{2}:\d{2}$/.test(row[1])
+          && /^\d+\.\d{2}$/.test(row[2])
+          && /^\d+\.\d{2}$/.test(row[3])
+          && /^\d+\.\d{2}$/.test(row[4])
+          && /^\d+\.\d{2}$/.test(row[5])
+          && /^\d+\.\d{2}$/.test(row[6])
+        ) {
+          return true
+        } else {
+          if (row[0] == "Date" || (row.length == 1 && row[0] == "") ){
+            // The usual headline and empty row
+          } else {
+            console.log('line', i, 'has an issue:',row)
+          }
+        }
+      })
+    return data
+  }
+
+  function parseTimeline(xml) {
+    var data = parseXml(xml)
+    console.log(data)
+  }
+  function parseXml(xmlStr) {
+    return new window.DOMParser().parseFromString(xmlStr, "text/xml");
+  }
 }])
 
 .factory('FileLoader', ['$window', function(win){
