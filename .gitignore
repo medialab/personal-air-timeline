@@ -55,3 +55,4 @@ app/bundle.js
 
 # Sensible data
 scripts/DATA
+scripts/*.csv

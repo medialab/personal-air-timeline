@@ -5,12 +5,13 @@
  * Script reading the shape files and indexing the data.
  */
 var csv = require('fast-csv'),
+    fs = require('fs'),
     QuadTree = require('./quad-tree.js');
 
 /**
  * Constants.
  */
-var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB.csv';
+var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB_head.csv';
 var THRESHOLD = 0.08;
 
 /**
@@ -62,4 +63,8 @@ csv.fromPath(DATA_PATH, {headers: true})
     });
 
     console.log(tree);
+
+    var treeCsv = tree.toCSV();
+
+    fs.writeFileSync('./scripts/quadtree.csv', treeCsv, 'utf-8');
   });
