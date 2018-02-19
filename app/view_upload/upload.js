@@ -313,12 +313,12 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         $scope[classReference] = 'over'
       })
       var files = evt.dataTransfer.files
-      if (files.length == 1) {
-        $scope.$apply(function(){
-          callback(files[0])
-          $scope[classReference] = ''
+      $scope.$apply(function(){
+        Array.from(files).forEach(function(file){
+          callback(file)
         })
-      }
+        $scope[classReference] = ''
+      })
     }, false)
   }
 }])
