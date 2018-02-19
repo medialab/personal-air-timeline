@@ -16,6 +16,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 , function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http) {
   $scope.dropClass
   $scope.loadingMessage = ''
+  $scope.uploadStatusMessage = 'PLEASE UPLOAD DATA'
 
 
   // File loading interactions
@@ -84,7 +85,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   // Make the text area droppable
-  droppable(document.getElementById("uploader"), $scope, $scope.readFile)
+  droppable(document.getElementById("sensor-uploader"), $scope, $scope.readFile)
 }])
 
 .factory('FileLoader', ['$window', function(win){

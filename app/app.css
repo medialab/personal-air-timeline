@@ -76,6 +76,12 @@ h3.script-title {
 .upload-background {
   background-color: #7595af;
 }
+.upload-background.color-sensor {
+  background-color: #665183;
+}
+.upload-background.color-timeline {
+  background-color: #7588af;
+}
 .upload-area-container{
   user-select: none;
   outline: none;
@@ -153,6 +159,15 @@ h3.script-title {
   font-weight: 200;
   margin-top: 0px;
   margin-bottom: 3px;
+}
+
+.upload-message-display {
+  color: rgba(0,0,0,.6);
+  background-color: #e4e2c2;
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  box-shadow: inset 2px 4px 3px rgba(0,0,0,.1);
+  text-shadow: 2px 3px 0px rgba(0, 0, 0, .1);
 }
 
 /* JS editor */
