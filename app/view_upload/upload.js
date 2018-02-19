@@ -14,34 +14,36 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
 .controller('UploadCtrl', ['droppable', '$scope', 'FileLoader', 'store', '$location', '$timeout', '$http'
 , function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http) {
-  $scope.dropClass
-  $scope.loadingMessage = ''
+  $scope.sensorDropClass
+  $scope.sensorLoadingMessage = ''
+  $scope.timelineDropClass
+  $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA'
 
 
   // File loading interactions
-  $scope.loadFile = function(){
-    document.querySelector('input#hidden-file-input').click()
+  // Sensor
+  $scope.loadSensorFile = function(){
+    document.querySelector('input#hidden-sensor-file-input').click()
   }
 
-  $scope.setFile = function(element) {
+  $scope.setSensorFile = function(element) {
     var file = element.files[0]
-    $scope.readFile(file)
+    $scope.readSensorFile(file)
   }
 
-  $scope.readFile = function(file){
-    store.set('graphname', file.name.replace(/\.[^\.]*$/, ''))
+  $scope.readSensorFile = function(file){
     var fileLoader = new FileLoader()
     fileLoader.read(file, {
       onloadstart: function(evt){
-        $scope.loadingMessage = 'UPLOADING...'
-        $scope.dropClass = 'loading'
+        $scope.sensorLoadingMessage = 'UPLOADING...'
+        $scope.sensorDropClass = 'loading'
         $scope.$apply()
       }
       ,onprogress: function(evt){
         // evt is a ProgressEvent
         if (evt.lengthComputable) {
-          $scope.loadingMessage = 'UPLOADING ' + Math.round((evt.loaded / evt.total) * 100) + '%'
+          $scope.sensorLoadingMessage = 'UPLOADING ' + Math.round((evt.loaded / evt.total) * 100) + '%'
           $scope.$apply()
         }
       }
@@ -52,40 +54,107 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           var g;
 
           try {
+            // TODO: THE PROPER PARSING
             g = gexf.parse(graphology.Graph, target.result);
           } catch(e) {
-            parsingFail()
+            sensorParsingFail()
           }
 
           if(g) {
             store.set('graph', g)
-            parsingSuccess()
+            sensorParsingSuccess()
           } else {
-            parsingFail()
+            sensorParsingFail()
           }
         } else {
-          parsingFail()
+          sensorParsingFail()
         }
       }
     })
   }
 
-  function parsingSuccess() {
-    $scope.loadingMessage = 'PARSED'
-    $scope.dropClass = 'success'
+  function sensorParsingSuccess() {
+    $scope.sensorLoadingMessage = 'PARSED'
+    $scope.sensorDropClass = 'success'
     $scope.$apply()
     $timeout(function(){
       $location.url('/board')
     }, 250)
   }
-  function parsingFail() {
-    $scope.loadingMessage = 'CANNOT PARSE'
-    $scope.dropClass = 'error'
+  function sensorParsingFail() {
+    $scope.sensorLoadingMessage = 'CANNOT PARSE'
+    $scope.sensorDropClass = 'error'
+    $scope.$apply()
+  }
+
+    // Timeline
+  $scope.loadTimelineFile = function(){
+    document.querySelector('input#hidden-timeline-file-input').click()
+  }
+
+  $scope.setTimelineFile = function(element) {
+    var file = element.files[0]
+    $scope.readTimelineFile(file)
+  }
+
+  $scope.readTimelineFile = function(file){
+    var fileLoader = new FileLoader()
+    fileLoader.read(file, {
+      onloadstart: function(evt){
+        $scope.timelineLoadingMessage = 'UPLOADING...'
+        $scope.timelineDropClass = 'loading'
+        $scope.$apply()
+      }
+      ,onprogress: function(evt){
+        // evt is a ProgressEvent
+        if (evt.lengthComputable) {
+          $scope.timelineLoadingMessage = 'UPLOADING ' + Math.round((evt.loaded / evt.total) * 100) + '%'
+          $scope.$apply()
+        }
+      }
+      ,onload: function(evt){
+        var target = evt.target || evt.srcElement
+
+        if (target.result) {
+          var g;
+
+          try {
+            // TODO: THE PROPER PARSING
+            g = gexf.parse(graphology.Graph, target.result);
+          } catch(e) {
+            timelineParsingFail()
+          }
+
+          if(g) {
+            store.set('graph', g)
+            timelineParsingSuccess()
+          } else {
+            timelineParsingFail()
+          }
+        } else {
+          timelineParsingFail()
+        }
+      }
+    })
+  }
+
+  function timelineParsingSuccess() {
+    $scope.timelineLoadingMessage = 'PARSED'
+    $scope.timelineDropClass = 'success'
+    $scope.$apply()
+    $timeout(function(){
+      $location.url('/board')
+    }, 250)
+  }
+  function timelineParsingFail() {
+    $scope.timelineLoadingMessage = 'CANNOT PARSE'
+    $scope.timelineDropClass = 'error'
     $scope.$apply()
   }
 
   // Make the text area droppable
-  droppable(document.getElementById("sensor-uploader"), $scope, $scope.readFile)
+  droppable(document.getElementById("sensor-uploader"), 'sensorDropClass', $scope, $scope.readSensorFile)
+  droppable(document.getElementById("timeline-uploader"), 'timelineDropClass', $scope, $scope.readTimelineFile)
 }])
 
 .factory('FileLoader', ['$window', function(win){
@@ -175,7 +244,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 }])
 
 .factory('droppable', [function(){
-  return function(droppable, $scope, callback){
+  return function(droppable, classReference, $scope, callback){
     //============== DRAG & DROP =============
     // adapted from http://jsfiddle.net/danielzen/utp7j/
 
@@ -184,7 +253,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       evt.stopPropagation()
       evt.preventDefault()
       $scope.$apply(function(){
-        $scope.dropClass = ''
+        $scope[classReference] = ''
       })
     }
     droppable.addEventListener("dragenter", dragEnterLeave, false)
@@ -194,7 +263,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       evt.preventDefault()
       var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0
       $scope.$apply(function(){
-        $scope.dropClass = ok ? 'over' : 'over-error'
+        $scope[classReference] = ok ? 'over' : 'over-error'
       })
     }, false)
     droppable.addEventListener("drop", function(evt) {
@@ -202,13 +271,13 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       evt.stopPropagation()
       evt.preventDefault()
       $scope.$apply(function(){
-        $scope.dropClass = 'over'
+        $scope[classReference] = 'over'
       })
       var files = evt.dataTransfer.files
       if (files.length == 1) {
         $scope.$apply(function(){
           callback(files[0])
-          $scope.dropClass = ''
+          $scope[classReference] = ''
         })
       }
     }, false)
