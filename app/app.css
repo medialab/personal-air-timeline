@@ -1,14 +1,5 @@
 #sidecol {
-  width: 300px;
-}
-
-.command-zone {
-  font-family: 'Raleway', sans-serif;
-  overflow-y: auto;
-}
-
-.network-info {
-  padding: 12px;
+  width: 400px;
 }
 
 .content {
@@ -20,11 +11,11 @@
   font-family: 'Raleway', sans-serif;
   font-size: 1.2em;
   color: #534b45;
-  background-color: #EDE9E2;
+  background-color: #d3d1c4;
 }
 
 .fancy-text .main-title {
-  font-family: 'Lobster', cursive;
+  font-family: 'Raleway', sans-serif;
   font-weight: 400;
   font-size: 2.6em;
   margin-top: 0;
@@ -85,6 +76,12 @@ h3.script-title {
 .upload-background {
   background-color: #7595af;
 }
+.upload-background.color-sensor {
+  background-color: #8f859e;
+}
+.upload-background.color-timeline {
+  background-color: #6d7994;
+}
 .upload-area-container{
   user-select: none;
   outline: none;
@@ -120,7 +117,11 @@ h3.script-title {
 .upload-area-container:hover   .upload-text-main,
 .upload-area-container.over    .upload-text-main,
 .upload-area-container.loading .upload-text-main,
-.upload-area-container.success .upload-text-main
+.upload-area-container.success .upload-text-main,
+.upload-area-container:hover   .upload-text-icon md-icon,
+.upload-area-container.over    .upload-text-icon md-icon,
+.upload-area-container.loading .upload-text-icon md-icon,
+.upload-area-container.success .upload-text-icon md-icon
 {
   color: #FFF;
 }
@@ -158,6 +159,15 @@ h3.script-title {
   font-weight: 200;
   margin-top: 0px;
   margin-bottom: 3px;
+}
+
+.upload-message-display {
+  color: rgba(0,0,0,.6);
+  background-color: #e4e2c2;
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  box-shadow: inset 2px 4px 3px rgba(0,0,0,.1);
+  text-shadow: 2px 3px 0px rgba(0, 0, 0, .1);
 }
 
 /* JS editor */

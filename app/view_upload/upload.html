@@ -1,9 +1,19 @@
 <div layout="row" layout-fill>
   <div layout="column" id="sidecol">
-    <div layout="column" layout-padding flex class="upload-background">
+    
+    <div layout="column" flex>
+      <pre
+        class="upload-message-display"
+        layout
+        layout-padding
+        layout-fill
+      >{{uploadStatusMessage}}</pre>
+    </div>
+
+    <div layout="column" layout-padding flex class="upload-background color-sensor">
       <div
         class="upload-area-container"
-        id="uploader"
+        id="sensor-uploader"
         ng-paste="handlePaste()"
         ng-click="loadFile()"
         ng-class="dropClass"
@@ -11,8 +21,32 @@
         layout
       >
         <div class="upload-area" layout="column" layout-align="center center">
+          <div class="upload-text-icon"><md-icon style="font-size:36px; margin-bottom: 12px">file_upload</md-icon></div>
           <div class="upload-text-main">
-            {{loadingMessage=='' ? 'LOAD GRAPH' : loadingMessage}}
+            {{loadingMessage=='' ? 'UPLOAD SENSOR DATA' : loadingMessage}}
+          </div>
+          <div class="upload-text-sub">
+            CLICK or DRAG A FILE
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div layout="column" layout-padding flex class="upload-background color-timeline">
+
+      <div
+        class="upload-area-container"
+        id="timeline-uploader"
+        ng-paste="handlePaste()"
+        ng-click="loadFile()"
+        ng-class="dropClass"
+        layout-fill
+        layout
+      >
+        <div class="upload-area" layout="column" layout-align="center center">
+          <div class="upload-text-icon"><md-icon style="font-size:36px; margin-bottom: 12px">file_upload</md-icon></div>
+          <div class="upload-text-main">
+            {{loadingMessage=='' ? 'UPLOAD TIMELINE DATA' : loadingMessage}}
           </div>
           <div class="upload-text-sub">
             CLICK or DRAG A FILE
