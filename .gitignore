@@ -50,4 +50,8 @@ Temporary Items
 .apdisk
 
 # Bundled JS
+package-lock.json
 app/bundle.js
+
+# Sensible data
+scripts/DATA
