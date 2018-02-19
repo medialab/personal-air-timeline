@@ -12,7 +12,9 @@ angular.module('saveourair.view_board', ['ngRoute'])
   });
 }])
 
-.controller('BoardCtrl', ['$scope', '$timeout'
-  ,function(               $scope ,  $timeout ) {
-
+.controller('BoardCtrl', ['$scope', '$timeout', '$location'
+  ,function(               $scope ,  $timeout ,  $location) {
+  	$timeout(function(){
+      $location.url('/upload')
+    }, 0)
 }]);

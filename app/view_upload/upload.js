@@ -34,6 +34,8 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.readSensorFile = function(file){
+    var fileName = file.name.replace(/\.[^\.]*$/, '')
+    console.log('Parse file', fileName)
     var fileLoader = new FileLoader()
     fileLoader.read(file, {
       onloadstart: function(evt){
@@ -163,6 +165,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       .map(function(row){return row.map(function(d){ return d.trim() })})
       .filter(function(row, i){
         if (
+          // Check that the data is properly formatted
           row.length == 7
           && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(row[0])
           && /^\d{1,2}:\d{2}:\d{2}$/.test(row[1])
@@ -177,7 +180,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           if (row[0] == "Date" || (row.length == 1 && row[0] == "") ){
             // The usual headline and empty row
           } else {
-            console.log('line', i, 'has an issue:',row)
+            console.warn('[Error] line', i, 'ignored: ',row)
           }
         }
       })
@@ -310,12 +313,12 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         $scope[classReference] = 'over'
       })
       var files = evt.dataTransfer.files
-      if (files.length == 1) {
-        $scope.$apply(function(){
-          callback(files[0])
-          $scope[classReference] = ''
+      $scope.$apply(function(){
+        Array.from(files).forEach(function(file){
+          callback(file)
         })
-      }
+        $scope[classReference] = ''
+      })
     }, false)
   }
 }])

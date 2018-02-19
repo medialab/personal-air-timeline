@@ -56,8 +56,8 @@
     </div>
 
     <!-- This hidden input is used for loading the files via the dropdown of the nav tabs -->
-    <input id="hidden-sensor-file-input" type="file" name="hidden-sensor-file-input" style="display: none;" onchange="angular.element(this).scope().setSensorFile(this)"/>
-    <input id="hidden-timeline-file-input" type="file" name="hidden-timeline-file-input" style="display: none;" onchange="angular.element(this).scope().setTimelineFile(this)"/>
+    <input id="hidden-sensor-file-input" type="file" multiple name="hidden-sensor-file-input" style="display: none;" onchange="angular.element(this).scope().setSensorFile(this)"/>
+    <input id="hidden-timeline-file-input" type="file" multiple name="hidden-timeline-file-input" style="display: none;" onchange="angular.element(this).scope().setTimelineFile(this)"/>
   </div>
   
   <div layout="column" layout-padding flex class="fancy-text content">
