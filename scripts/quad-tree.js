@@ -30,7 +30,12 @@ QuadTree.prototype.toCSV = function() {
       quad,
       mask;
 
-  lines[i++] = ['leaf', 'count', 'mu', 'mask'];
+  lines[i++] = [
+    this.root.x,
+    this.root.y,
+    this.root.width,
+    this.root.height
+  ];
 
   while (stack.length) {
     quad = stack.pop();
@@ -55,6 +60,24 @@ QuadTree.prototype.toCSV = function() {
   }
 
   return lines.join('\n');
+};
+
+QuadTree.prototype.fromCSV = function(lines) {
+  var tree = new QuadTree(),
+      quad = tree.root,
+      stack = [quad];
+
+  tree.dimension = lines.length;
+
+  var line,
+      i,
+      l;
+
+  for (i = 0, l = lines.length; i < l; i++) {
+    line = lines[i];
+
+    // if (line.leaf)
+  }
 };
 
 QuadTree.fromPoints = function(points, threshold, boundaries) {

@@ -11,7 +11,7 @@ var csv = require('fast-csv'),
 /**
  * Constants.
  */
-var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB_head.csv';
+var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB.csv';
 var THRESHOLD = 0.08;
 
 /**
