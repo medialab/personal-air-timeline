@@ -69,32 +69,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     })
   }
 
-  // FIXME: factor this with normal loading
-  $scope.loadExample = function (dataUrl) {
-    $scope.loadingMessage = 'LOADING...'
-    store.set('graphname', dataUrl.replace(/\.[^\.]*$/, ''))
-    $http.get(dataUrl).then(function (data) {
-      $timeout(function(){
-        var g;
-
-        try {
-          g = gexf.parse(graphology.Graph, data.data);
-        } catch(e) {console.log(e);
-          parsingFail()
-        }
-
-        if(g) {
-          store.set('graph', g)
-          parsingSuccess()
-        } else {
-          parsingFail()
-        }
-      })
-    }, function(){
-      parsingFail()
-    })
-  }
-
   function parsingSuccess() {
     $scope.loadingMessage = 'PARSED'
     $scope.dropClass = 'success'

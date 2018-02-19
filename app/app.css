@@ -1,14 +1,5 @@
 #sidecol {
-  width: 300px;
-}
-
-.command-zone {
-  font-family: 'Raleway', sans-serif;
-  overflow-y: auto;
-}
-
-.network-info {
-  padding: 12px;
+  width: 400px;
 }
 
 .content {
@@ -120,7 +111,11 @@ h3.script-title {
 .upload-area-container:hover   .upload-text-main,
 .upload-area-container.over    .upload-text-main,
 .upload-area-container.loading .upload-text-main,
-.upload-area-container.success .upload-text-main
+.upload-area-container.success .upload-text-main,
+.upload-area-container:hover   .upload-text-icon md-icon,
+.upload-area-container.over    .upload-text-icon md-icon,
+.upload-area-container.loading .upload-text-icon md-icon,
+.upload-area-container.success .upload-text-icon md-icon
 {
   color: #FFF;
 }
