@@ -7,6 +7,7 @@ require('angular-material/angular-material.min.css');
 require('angular');
 require('angular-animate');
 require('angular-aria');
+require('angular-sanitize');
 require('angular-material');
 require('angular-route');
 
@@ -38,6 +39,7 @@ require('./view_board/board.js');
 // Declare app level module which depends on views, and components
 angular.module('saveourair', [
   'ngRoute',
+  'ngSanitize',
   'ngMaterial',
   'saveourair.view_upload',
   'saveourair.view_board'
