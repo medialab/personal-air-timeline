@@ -27,20 +27,23 @@ function QuadTree() {
 
 QuadTree.prototype.toCSV = function() {
   var lines = new Array(this.dimension + 1),
-      stack = [this.root],
+      stack = [[this.root, 0]],
       i = 0,
       quad,
+      quadIndex,
       mask;
 
   lines[i++] = [
     this.root.x,
     this.root.y,
     this.root.width,
-    this.root.height
+    this.root.height,
+    this.size,
+    this.depth
   ];
 
   while (stack.length) {
-    quad = stack.pop();
+    [quad, quadIndex] = stack.pop();
 
     mask = [
       +!!quad.quads[0],
@@ -49,37 +52,124 @@ QuadTree.prototype.toCSV = function() {
       +!!quad.quads[3]
     ].join('');
 
-    lines[i++] = [+quad.leaf, quad.count, quad.mu, parseInt(mask, 2)].join(',');
+    lines[i++] = [
+      quad.count,
+      quad.mu.toFixed(4).length < quad.mu.toString().length ?
+        quad.mu.toFixed(4) :
+        quad.mu,
+      parseInt(mask, 2),
+      quadIndex
+    ].join(',');
 
     if (quad.quads[3])
-      stack.push(quad.quads[3]);
+      stack.push([quad.quads[3], 3]);
     if (quad.quads[2])
-      stack.push(quad.quads[2]);
+      stack.push([quad.quads[2], 2]);
     if (quad.quads[1])
-      stack.push(quad.quads[1]);
+      stack.push([quad.quads[1], 1]);
     if (quad.quads[0])
-      stack.push(quad.quads[0]);
+      stack.push([quad.quads[0], 0]);
   }
 
   return lines.join('\n');
 };
 
-QuadTree.prototype.fromCSV = function(lines) {
+function last(array) {
+  return array[array.length - 1];
+}
+
+function getStringMask(number) {
+  return ('0000' + number.toString(2)).slice(-4);
+}
+
+QuadTree.fromCSV = function(lines) {
+  var boundaries = lines[0];
+
   var tree = new QuadTree(),
       quad = tree.root,
       stack = [quad];
 
-  tree.dimension = lines.length;
+  quad.x = +boundaries[0];
+  quad.y = +boundaries[1];
+  quad.width = +boundaries[2];
+  quad.height = +boundaries[3];
 
-  var line,
+  tree.size = +boundaries[4];
+  tree.depth = +boundaries[5],
+  tree.dimension = lines.length - 1;
+
+  var quad,
+      quadIndex,
+      parent,
+      line,
+      isLeaf,
+      count,
+      halfWidth,
+      halfHeight,
+      mu,
+      mask,
       i,
       l;
 
-  for (i = 0, l = lines.length; i < l; i++) {
-    line = lines[i];
+  line = lines[1];
 
-    // if (line.leaf)
+  // NOTE: will break if root is leaf obviously...
+  quad.count = +line[0];
+  quad.mu = +line[1];
+  quad.lastChild = getStringMask(+line[2]).lastIndexOf('1');
+
+  for (i = 2, l = lines.length; i < l; i++) {
+    line = lines[i];
+    count = +line[0];
+    mu = +line[1];
+    mask = +line[2];
+    quadIndex = +line[3];
+    isLeaf = mask === 0;
+
+    parent = last(stack);
+
+    halfWidth = parent.width / 2;
+    halfHeight = parent.height / 2;
+
+    if (quadIndex === 0)
+      quad = new Quad(parent.x, parent.y, halfWidth, halfHeight);
+    else if (quadIndex === 1)
+      quad = new Quad(parent.x + halfWidth, parent.y, halfWidth, halfHeight);
+    else if (quadIndex === 2)
+      quad = new Quad(parent.x, parent.y + halfHeight, halfWidth, halfHeight);
+    else
+      quad = new Quad(parent.x + halfWidth, parent.y + halfHeight, halfWidth, halfHeight);
+
+    parent.quads[quadIndex] = quad;
+
+    quad.count = count;
+    quad.mu = mu;
+
+    if (isLeaf) {
+      quad.leaf = true;
+
+      if (mu < tree.min)
+        tree.min = mu;
+
+      if (mu > tree.max)
+        tree.max = mu;
+
+      // Should we bubble up?
+      while (stack.length && parent.quads[parent.lastChild] instanceof Quad) {
+        delete parent.lastChild;
+        stack.pop();
+        parent = last(stack);
+      }
+    }
+    else {
+      quad.lastChild = getStringMask(mask).lastIndexOf('1');
+      stack.push(quad);
+    }
   }
+
+  delete tree.root.lastChild;
+
+  return tree;
 };
 
 QuadTree.fromPoints = function(points, threshold, boundaries) {
@@ -113,6 +203,9 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
 
   while (stack.length) {
     [points, parent, depth] = stack.pop();
+
+    if (depth > tree.depth)
+      tree.depth = depth;
 
     minValue = Infinity;
     maxValue = -Infinity;
@@ -214,8 +307,6 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
       stack.push([subpoints[3], quad, depth + 1]);
     }
   }
-
-  tree.depth = depth;
 
   return tree;
 };

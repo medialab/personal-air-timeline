@@ -13,7 +13,7 @@ var csv = require('fast-csv'),
  */
 var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB.csv';
 var OUTPUT_PATH = './scripts/quad-tree.csv';
-var THRESHOLD = 0.08;
+var THRESHOLD = 5;
 
 /**
  * State.
