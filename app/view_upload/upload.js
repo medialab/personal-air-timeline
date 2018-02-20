@@ -18,7 +18,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.sensorLoadingMessage = ''
   $scope.timelineDropClass
   $scope.timelineLoadingMessage = ''
-  $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA'
+  $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\nmultiple files allowed'
 
   store.set('timelines', [])
 
