@@ -20,6 +20,8 @@ function QuadTree() {
   this.size = 0;
   this.dimension = 1;
   this.depth = 0;
+  this.min = Infinity;
+  this.max = -Infinity;
   this.root = new Quad();
 }
 
@@ -152,6 +154,13 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
 
     if (span < threshold) {
       parent.leaf = true;
+
+      if (mu < tree.min)
+        tree.min = mu;
+
+      if (mu > tree.max)
+        tree.max = mu;
+
       continue;
     }
 

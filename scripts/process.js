@@ -12,6 +12,7 @@ var csv = require('fast-csv'),
  * Constants.
  */
 var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB.csv';
+var OUTPUT_PATH = './scripts/quad-tree.csv';
 var THRESHOLD = 0.08;
 
 /**
@@ -66,5 +67,5 @@ csv.fromPath(DATA_PATH, {headers: true})
 
     var treeCsv = tree.toCSV();
 
-    fs.writeFileSync('./scripts/quadtree.csv', treeCsv, 'utf-8');
+    fs.writeFileSync(OUTPUT_PATH, treeCsv, 'utf-8');
   });
