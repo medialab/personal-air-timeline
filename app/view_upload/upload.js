@@ -18,12 +18,28 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.sensorLoadingMessage = ''
   $scope.timelineDropClass
   $scope.timelineLoadingMessage = ''
-  $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\nmultiple files allowed'
+  $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\n> Multiple files allowed'
 
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
-  // store.set('timelines', [])
+  $scope.$watch('sensorFiles', updateUploads, true)
+  $scope.$watch('timelineFiles', updateUploads, true)
+
+  function updateUploads() {
+    var someTimelineFiles = Object.keys($scope.timelineFiles).length > 0
+    var someSensorFiles = Object.keys($scope.sensorFiles).length > 0
+    if (someSensorFiles && someTimelineFiles) {
+      $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data ............ OK\n>>>>>>>>>>>>>>>>>> DATA READY\n\nNote: You may upload\n      additional files'
+    } else if (someSensorFiles && !someTimelineFiles) {
+      $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data > PLEASE UPLOAD'
+    } else if (!someSensorFiles && someTimelineFiles) {
+      $scope.uploadStatusMessage = 'Sensor data >>> PLEASE UPLOAD\nTimeline data ............ OK'
+    }
+
+    store.set('timelineFiles', $scope.timelineFiles)
+    store.set('sensorFiles', $scope.sensorFiles)
+  }
 
   // File loading interactions
   // Sensor
@@ -189,7 +205,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
   function parseTimeline(xml) {
     var domdata = parseXml(xml)
-    console.log(domdata)
     window.td = domdata
 
     var datapoints = []
@@ -215,10 +230,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       }
     })
 
-    console.log(datapoints)
-
     return datapoints
   }
+
   function parseXml(xmlStr) {
     return new window.DOMParser().parseFromString(xmlStr, "text/xml");
   }
