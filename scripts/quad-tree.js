@@ -264,13 +264,22 @@ QuadTree.fromPoints = function(points, params) {
     mu /= points.length;
     span = maxValue - minValue;
 
-    halfWidth = parent.width / 2;
-    halfHeight = parent.height / 2;
-
     parent.mu = mu;
     parent.count = points.length;
 
-    if (span < threshold) {
+    if (
+      (
+        parent.width <= minQuadSize[0] ||
+        parent.height <= minQuadSize[1]
+      ) ||
+      (
+        span < threshold &&
+        !(
+          parent.width > maxQuadSize[0] ||
+          parent.height > maxQuadSize[1]
+        )
+      )
+    ) {
       parent.leaf = true;
       tree.leaves++;
 
@@ -287,6 +296,9 @@ QuadTree.fromPoints = function(points, params) {
     }
 
     // If span is too wide, we need to subdivide into quadrants
+    halfWidth = parent.width / 2;
+    halfHeight = parent.height / 2;
+
     var subpoints = Array.from([1, 2, 3, 4], () => []);
 
     for (i = 0; i < l; i++) {

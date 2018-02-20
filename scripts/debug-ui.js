@@ -30,7 +30,7 @@ function render(tree) {
 
   const valueScale = d3.scaleLinear()
     .domain([tree.min, tree.max])
-    .range(['yellow', 'red']);
+    .range(['yellow', 'black']);
 
   const ratio = Math.min(
     width / tree.root.width,
@@ -47,10 +47,10 @@ function render(tree) {
 
   // Iterating over leaves
   tree.forEachLeaf(quad => {
-    const x1 = xScale(quad.x) | 0,
-          y1 = yScale(quad.y) | 0,
-          x2 = xScale(quad.x + quad.width) | 0,
-          y2 = yScale(quad.y + quad.height) | 0;
+    const x1 = Math.floor(xScale(quad.x)),
+          y1 = Math.ceil(yScale(quad.y)),
+          x2 = Math.ceil(xScale(quad.x + quad.width)),
+          y2 = Math.floor(yScale(quad.y + quad.height));
 
     let x = x1,
         y = y2,
