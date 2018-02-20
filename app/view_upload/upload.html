@@ -21,7 +21,7 @@
         layout
       >
         <div class="upload-area" layout="column" layout-align="center center">
-          <div class="upload-text-icon"><md-icon style="font-size:36px; margin-bottom: 12px">file_upload</md-icon></div>
+          <div class="upload-text-icon"><md-icon style="font-size:38px; margin-bottom: 12px">file_upload</md-icon></div>
           <div class="upload-text-main">
             {{sensorLoadingMessage=='' ? 'UPLOAD SENSOR DATA' : sensorLoadingMessage}}
           </div>
@@ -44,7 +44,7 @@
         layout
       >
         <div class="upload-area" layout="column" layout-align="center center">
-          <div class="upload-text-icon"><md-icon style="font-size:36px; margin-bottom: 12px">file_upload</md-icon></div>
+          <div class="upload-text-icon"><md-icon style="font-size:38px; margin-bottom: 12px">file_upload</md-icon></div>
           <div class="upload-text-main">
             {{timelineLoadingMessage=='' ? 'UPLOAD TIMELINE DATA' : timelineLoadingMessage}}
           </div>
@@ -67,11 +67,16 @@
     class="fancy-text content"
     ng-if="(sensorFiles|keylength) == 0 && (timelineFiles|keylength) == 0"
   >
-    <h1 class="main-title">
-      Personal Air Timeline
-      <br>
-      <span class="subtitle">Assemble your GPS and air pollution sensor data</span>
-    </h1>
+    <div layout="row">
+      <md-icon style="width: 128px; font-size:105px; margin: 0px; color: #FFF">cloud_upload</md-icon>
+      <div flex layout="column">
+        <h1 class="main-title">
+          Personal Air Timeline
+          <br>
+          <span class="subtitle">Assemble your GPS and air pollution sensor data</span>
+        </h1>
+      </div>
+    </div>
     <p>
       [Description to do]
     </p>
@@ -91,8 +96,22 @@
       layout="row"
       layout-padding
       flex="30"
+      class="fancy-text content"
+      ng-if="(sensorFiles|keylength) > 0 && (timelineFiles|keylength) > 0"
     >
-      TEMP TITLE
+      <div layout="column" flex>
+        [MERGE: TODO]
+      </div>
+      <div layout="column">
+        <md-button class="md-raised md-primary">
+          <md-icon>file_download</md-icon>
+          Download
+        </md-button>
+        <md-button class="md-raised">
+          <md-icon>show_chart</md-icon>
+          Preview
+        </md-button>
+      </div>
     </div>
     <div
       layout
