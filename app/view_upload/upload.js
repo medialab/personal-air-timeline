@@ -12,15 +12,18 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   });
 }])
 
-.controller('UploadCtrl', ['droppable', '$scope', 'FileLoader', 'store', '$location', '$timeout', '$http'
-, function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http) {
+.controller('UploadCtrl', ['droppable', '$scope', 'FileLoader', 'store', '$location', '$timeout', '$http', '$mdToast'
+, function(                 droppable ,  $scope ,  FileLoader ,  store ,  $location ,  $timeout ,  $http ,  $mdToast) {
   $scope.sensorDropClass
   $scope.sensorLoadingMessage = ''
   $scope.timelineDropClass
   $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\nmultiple files allowed'
 
-  store.set('timelines', [])
+  $scope.sensorFiles = {}
+  $scope.timelineFiles = {}
+
+  // store.set('timelines', [])
 
   // File loading interactions
   // Sensor
@@ -57,39 +60,38 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           var data;
 
           try {
-            data = parseSensor(target.result);
+            data = parseSensor(target.result, fileName);
           } catch(e) {
-            sensorParsingFail()
+            sensorParsingFail(fileName)
           }
 
           if(data) {
-            store.set('sensor', data)
+            // store.set('sensor', data)
+            $scope.sensorFiles[fileName] = data
             sensorParsingSuccess()
           } else {
-            sensorParsingFail()
+            sensorParsingFail(fileName)
           }
         } else {
-          sensorParsingFail()
+          sensorParsingFail(fileName)
         }
       }
     })
   }
 
   function sensorParsingSuccess() {
-    $scope.sensorLoadingMessage = 'PARSED'
-    $scope.sensorDropClass = 'success'
+    $scope.sensorLoadingMessage = ''
+    $scope.sensorDropClass = ''
     $scope.$apply()
-    $timeout(function(){
-      $location.url('/board')
-    }, 250)
   }
-  function sensorParsingFail() {
-    $scope.sensorLoadingMessage = 'CANNOT PARSE'
-    $scope.sensorDropClass = 'error'
+  function sensorParsingFail(fileName) {
+    $scope.sensorLoadingMessage = ''
+    $scope.sensorDropClass = ''
     $scope.$apply()
+    showSimpleToast('/!\\ ' + fileName + ' PARSING FAILED')
   }
 
-    // Timeline
+  // Timeline
   $scope.loadTimelineFile = function(){
     document.querySelector('input#hidden-timeline-file-input').click()
   }
@@ -128,7 +130,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           }
 
           if(g) {
-            store.set('graph', g)
+            // store.set('graph', g)
             timelineParsingSuccess()
           } else {
             timelineParsingFail()
@@ -159,7 +161,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   droppable(document.getElementById("timeline-uploader"), 'timelineDropClass', $scope, $scope.readTimelineFile)
 
   // Parsing functions
-  function parseSensor(csv) {
+  function parseSensor(csv, fileName) {
     // Columns are: "Date", " Time", " T", " RH", " P", " PM2.5", " PM10"
     var data = d3.csvParseRows(csv)
       .map(function(row){return row.map(function(d){ return d.trim() })})
@@ -180,7 +182,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           if (row[0] == "Date" || (row.length == 1 && row[0] == "") ){
             // The usual headline and empty row
           } else {
-            console.warn('[Error] line', i, 'ignored: ',row)
+            console.warn('[Error]', fileName, 'line', i, 'ignored: ',row)
           }
         }
       })
@@ -194,6 +196,17 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function parseXml(xmlStr) {
     return new window.DOMParser().parseFromString(xmlStr, "text/xml");
   }
+
+  // Notifications
+  function showSimpleToast(message) {
+
+    $mdToast.show(
+      $mdToast.simple()
+        .textContent(message)
+        .hideDelay(3000)
+    );
+  };
+
 }])
 
 .factory('FileLoader', ['$window', function(win){
@@ -260,6 +273,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       }
     }
   }
+
 }])
 
 .factory('store', [function(){
