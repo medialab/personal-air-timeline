@@ -67,11 +67,16 @@
     class="fancy-text content"
     ng-if="(sensorFiles|keylength) == 0 && (timelineFiles|keylength) == 0"
   >
-    <h1 class="main-title">
-      Personal Air Timeline
-      <br>
-      <span class="subtitle">Assemble your GPS and air pollution sensor data</span>
-    </h1>
+    <div layout="row">
+      <md-icon style="width: 128px; font-size:105px; margin: 0px; color: #FFF">cloud_upload</md-icon>
+      <div flex layout="column">
+        <h1 class="main-title">
+          Personal Air Timeline
+          <br>
+          <span class="subtitle">Assemble your GPS and air pollution sensor data</span>
+        </h1>
+      </div>
+    </div>
     <p>
       [Description to do]
     </p>
