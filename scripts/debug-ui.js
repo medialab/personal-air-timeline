@@ -28,9 +28,8 @@ function render(tree) {
   const img = context.getImageData(0, 0, width, height),
         data = img.data;
 
-  const valueScale = d3.scaleLinear()
-    .domain([tree.min, tree.max])
-    .range(['yellow', 'black']);
+  const valueScale = d3.scaleSequential(d3.interpolateInferno)
+    .domain([tree.min, tree.max]);
 
   const ratio = Math.min(
     width / tree.root.width,
@@ -56,21 +55,15 @@ function render(tree) {
         y = y2,
         i;
 
-    const color = valueScale(quad.mu);
-
-    let [, r, g, b] = color.match(/rgb\((\d+),\s(\d+),\s(\d+)\)/);
-
-    r = +r;
-    g = +g;
-    b = +b
+    const color = d3.rgb(valueScale(quad.mu));
 
     for (; x < x2; x++) {
       for (; y > y2; y--) {
         i = y * (img.width * 4) + x * 4;
 
-        data[i]     = r;
-        data[i + 1] = g;
-        data[i + 2] = b;
+        data[i]     = color.r;
+        data[i + 1] = color.g;
+        data[i + 2] = color.b;
         data[i + 3] = 255;
       }
 
