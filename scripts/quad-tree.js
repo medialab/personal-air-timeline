@@ -5,6 +5,8 @@
  * Custom QuadTree data structure aiming at grouping the given point based
  * on some value.
  */
+var Stack = require('mnemonist/stack');
+
 function Quad(x, y, width, height) {
   this.mu = 0;
   this.quads = new Array(4);
@@ -27,7 +29,7 @@ function QuadTree() {
 
 QuadTree.prototype.toCSV = function() {
   var lines = new Array(this.dimension + 1),
-      stack = [[this.root, 0]],
+      stack = Stack.from([[this.root, 0]]),
       i = 0,
       quad,
       quadIndex,
@@ -42,7 +44,7 @@ QuadTree.prototype.toCSV = function() {
     this.depth
   ];
 
-  while (stack.length) {
+  while (stack.size) {
     [quad, quadIndex] = stack.pop();
 
     mask = [
@@ -74,20 +76,19 @@ QuadTree.prototype.toCSV = function() {
   return lines.join('\n');
 };
 
-function last(array) {
-  return array[array.length - 1];
-}
-
 function getStringMask(number) {
   return ('0000' + number.toString(2)).slice(-4);
 }
+
+// TODO: use mnemonist
+// TODO: clear up dimension
 
 QuadTree.fromCSV = function(lines) {
   var boundaries = lines[0];
 
   var tree = new QuadTree(),
       quad = tree.root,
-      stack = [quad];
+      stack = Stack.from([quad]);
 
   quad.x = +boundaries[0];
   quad.y = +boundaries[1];
@@ -126,7 +127,7 @@ QuadTree.fromCSV = function(lines) {
     quadIndex = +line[3];
     isLeaf = mask === 0;
 
-    parent = last(stack);
+    parent = stack.peek();
 
     halfWidth = parent.width / 2;
     halfHeight = parent.height / 2;
@@ -155,10 +156,10 @@ QuadTree.fromCSV = function(lines) {
         tree.max = mu;
 
       // Should we bubble up?
-      while (stack.length && parent.quads[parent.lastChild] instanceof Quad) {
+      while (stack.size && parent.quads[parent.lastChild] instanceof Quad) {
         delete parent.lastChild;
         stack.pop();
-        parent = last(stack);
+        parent = stack.peek();
       }
     }
     else {
@@ -174,7 +175,7 @@ QuadTree.fromCSV = function(lines) {
 
 QuadTree.fromPoints = function(points, threshold, boundaries) {
   var tree = new QuadTree(),
-      stack = [[points, tree.root, 0]];
+      stack = Stack.from([[points, tree.root, 0]]);
 
   tree.root.x = boundaries.x;
   tree.root.y = boundaries.y;
@@ -201,7 +202,7 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
       i,
       l;
 
-  while (stack.length) {
+  while (stack.size) {
     [points, parent, depth] = stack.pop();
 
     if (depth > tree.depth)
