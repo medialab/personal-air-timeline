@@ -20,7 +20,8 @@ function Quad(x, y, width, height) {
 
 function QuadTree() {
   this.size = 0;
-  this.dimension = 1;
+  this.quads = 1;
+  this.leaves = 0;
   this.depth = 0;
   this.min = Infinity;
   this.max = -Infinity;
@@ -28,7 +29,7 @@ function QuadTree() {
 }
 
 QuadTree.prototype.toCSV = function() {
-  var lines = new Array(this.dimension + 1),
+  var lines = new Array(this.quads + 1),
       stack = Stack.from([[this.root, 0]]),
       i = 0,
       quad,
@@ -80,8 +81,7 @@ function getStringMask(number) {
   return ('0000' + number.toString(2)).slice(-4);
 }
 
-// TODO: use mnemonist
-// TODO: clear up dimension
+// TODO: lighten by dropping quadIndex from CSV
 
 QuadTree.fromCSV = function(lines) {
   var boundaries = lines[0];
@@ -97,7 +97,7 @@ QuadTree.fromCSV = function(lines) {
 
   tree.size = +boundaries[4];
   tree.depth = +boundaries[5],
-  tree.dimension = lines.length - 1;
+  tree.quads = lines.length - 1;
 
   var quad,
       quadIndex,
@@ -148,6 +148,7 @@ QuadTree.fromCSV = function(lines) {
 
     if (isLeaf) {
       quad.leaf = true;
+      tree.leaves++;
 
       if (mu < tree.min)
         tree.min = mu;
@@ -205,9 +206,6 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
   while (stack.size) {
     [points, parent, depth] = stack.pop();
 
-    if (depth > tree.depth)
-      tree.depth = depth;
-
     minValue = Infinity;
     maxValue = -Infinity;
     minX = Infinity;
@@ -248,6 +246,10 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
 
     if (span < threshold) {
       parent.leaf = true;
+      tree.leaves++;
+
+      if (depth > tree.depth)
+        tree.depth = depth;
 
       if (mu < tree.min)
         tree.min = mu;
@@ -281,28 +283,28 @@ QuadTree.fromPoints = function(points, threshold, boundaries) {
     }
 
     if (subpoints[0].length) {
-      tree.dimension++;
+      tree.quads++;
       quad = new Quad(parent.x, parent.y, halfWidth, halfHeight);
       parent.quads[0] = quad;
       stack.push([subpoints[0], quad, depth + 1]);
     }
 
     if (subpoints[1].length) {
-      tree.dimension++;
+      tree.quads++;
       quad = new Quad(parent.x + halfWidth, parent.y, halfWidth, halfHeight);
       parent.quads[1] = quad;
       stack.push([subpoints[1], quad, depth + 1]);
     }
 
     if (subpoints[2].length) {
-      tree.dimension++;
+      tree.quads++;
       quad = new Quad(parent.x, parent.y + halfHeight, halfWidth, halfHeight);
       parent.quads[2] = quad;
       stack.push([subpoints[2], quad, depth + 1]);
     }
 
     if (subpoints[3].length) {
-      tree.dimension++;
+      tree.quads++;
       quad = new Quad(parent.x + halfWidth, parent.y + halfHeight, halfWidth, halfHeight);
       parent.quads[3] = quad;
       stack.push([subpoints[3], quad, depth + 1]);
