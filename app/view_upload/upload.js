@@ -66,7 +66,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
           }
 
           if(data) {
-            // store.set('sensor', data)
             $scope.sensorFiles[fileName] = data
             sensorParsingSuccess()
           } else {
@@ -102,6 +101,8 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.readTimelineFile = function(file){
+    var fileName = file.name.replace(/\.[^\.]*$/, '')
+    console.log('Parse file', fileName)
     var fileLoader = new FileLoader()
     fileLoader.read(file, {
       onloadstart: function(evt){
@@ -120,40 +121,37 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         var target = evt.target || evt.srcElement
 
         if (target.result) {
-          var g;
+          var data;
 
           try {
-            // TODO: THE PROPER PARSING
-            g = gexf.parse(graphology.Graph, target.result);
+            data = parseTimeline(target.result, fileName);
           } catch(e) {
-            timelineParsingFail()
+            timelineParsingFail(fileName)
           }
 
-          if(g) {
-            // store.set('graph', g)
+          if(data) {
+            $scope.timelineFiles[fileName] = data
             timelineParsingSuccess()
           } else {
-            timelineParsingFail()
+            timelineParsingFail(fileName)
           }
         } else {
-          timelineParsingFail()
+          timelineParsingFail(fileName)
         }
       }
     })
   }
 
   function timelineParsingSuccess() {
-    $scope.timelineLoadingMessage = 'PARSED'
-    $scope.timelineDropClass = 'success'
+    $scope.timelineLoadingMessage = ''
+    $scope.timelineDropClass = ''
     $scope.$apply()
-    $timeout(function(){
-      $location.url('/board')
-    }, 250)
   }
-  function timelineParsingFail() {
-    $scope.timelineLoadingMessage = 'CANNOT PARSE'
-    $scope.timelineDropClass = 'error'
+  function timelineParsingFail(fileName) {
+    $scope.timelineLoadingMessage = ''
+    $scope.timelineDropClass = ''
     $scope.$apply()
+    showSimpleToast('/!\\ ' + fileName + ' PARSING FAILED')
   }
 
   // Make the text area droppable
@@ -190,8 +188,36 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   function parseTimeline(xml) {
-    var data = parseXml(xml)
-    console.log(data)
+    var domdata = parseXml(xml)
+    console.log(domdata)
+    window.td = domdata
+
+    var datapoints = []
+    td.querySelectorAll('Placemark').forEach(function(d){
+      var point = d.querySelector('Point')
+      var line = d.querySelector('LineString')
+      if (point) {
+        datapoints.push({
+          type:'point',
+          path:d.querySelector('Point coordinates').textContent,
+          begin:d.querySelector('TimeSpan begin').textContent,
+          end:d.querySelector('TimeSpan end').textContent
+        })
+      } else if (line) {
+        datapoints.push({
+          type:'linestring',
+          path:d.querySelector('LineString coordinates').textContent,
+          begin:d.querySelector('TimeSpan begin').textContent,
+          end:d.querySelector('TimeSpan end').textContent
+        })
+      } else {
+        console.warn('[issue] Placemark has neither Point nor LineString', d)
+      }
+    })
+
+    console.log(datapoints)
+
+    return datapoints
   }
   function parseXml(xmlStr) {
     return new window.DOMParser().parseFromString(xmlStr, "text/xml");

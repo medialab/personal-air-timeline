@@ -109,12 +109,12 @@
             </div>
           </md-list-item>
           <md-divider></md-divider>
-          <md-subheader>{{timelineFiles|keylength}} TIMELINE FILES</md-subheader>
+          <md-subheader>{{timelineFiles|keylength}} FILES uploaded from the GOOGLE TIMELINE</md-subheader>
           <md-list-item class="md-2-line" ng-repeat="(fileName, fileData) in timelineFiles">
             <md-icon class="md-avatar-icon">insert_drive_file</md-icon>
             <div class="md-list-item-text">
               <h3> {{ fileName }} </h3>
-              <!-- <p> {{ fileData.length }} lines</p> -->
+              <p> {{ fileData.length }} GPS data points</p>
             </div>
           </md-list-item>
         </md-list>
