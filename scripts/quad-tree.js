@@ -28,6 +28,27 @@ function QuadTree() {
   this.root = new Quad();
 }
 
+QuadTree.prototype.forEachLeaf = function(callback) {
+  var stack = Stack.from([this.root]),
+      quad;
+
+  while (stack.size) {
+    quad = stack.pop();
+
+    if (quad.leaf)
+      callback(quad);
+
+    if (quad.quads[3])
+      stack.push(quad.quads[3]);
+    if (quad.quads[2])
+      stack.push(quad.quads[2]);
+    if (quad.quads[1])
+      stack.push(quad.quads[1]);
+    if (quad.quads[0])
+      stack.push(quad.quads[0]);
+  }
+};
+
 QuadTree.prototype.toCSV = function() {
   var lines = new Array(this.quads + 1),
       stack = Stack.from([[this.root, 0]]),
@@ -174,7 +195,12 @@ QuadTree.fromCSV = function(lines) {
   return tree;
 };
 
-QuadTree.fromPoints = function(points, threshold, boundaries) {
+QuadTree.fromPoints = function(points, params) {
+  var threshold = params.threshold,
+      boundaries = params.boundaries,
+      minQuadSize = params.minQuadSize,
+      maxQuadSize = params.maxQuadSize;
+
   var tree = new QuadTree(),
       stack = Stack.from([[points, tree.root, 0]]);
 

@@ -23,16 +23,18 @@
   },
   "devDependencies": {
     "css-loader": "^0.28.4",
+    "kotatsu": "^0.15.2",
     "style-loader": "^0.19.0",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.3.0"
   },
   "scripts": {
     "build": "webpack --colors --progress",
-    "convert": "ogr2ogr -f CSV -t_srs crs:84",
     "dev": "webpack-dev-server --port 3000 -d --colors --progress --watch",
     "postinstall": "npm run build",
-    "process": "node scripts/process.js",
+    "quad:convert": "ogr2ogr -f CSV -t_srs crs:84",
+    "quad:debug": "kotatsu serve --progress --es2015 --port 8000 --public . --index ./scripts/debug-ui.html ./scripts/debug-ui.js",
+    "quad:process": "node scripts/process.js",
     "watch": "webpack -d --colors --progress --watch"
   },
   "repository": {

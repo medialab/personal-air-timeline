@@ -13,7 +13,7 @@ var csv = require('fast-csv'),
  */
 var DATA_PATH = './scripts/DATA/ADR_KMS2010_OSPM_UBM_2371624_strip_Mar2015_OSPM_UBM_THOB.csv';
 var OUTPUT_PATH = './scripts/quad-tree.csv';
-var THRESHOLD = 5;
+var THRESHOLD = 0.1;
 
 /**
  * State.
@@ -56,11 +56,28 @@ csv.fromPath(DATA_PATH, {headers: true})
     console.log();
     console.log('Building QuadTree...');
 
-    var tree = QuadTree.fromPoints(POINTS, THRESHOLD, {
+    var boundaries = {
       x: MIN_X,
       y: MIN_Y,
       width: MAX_X - MIN_X,
       height: MAX_Y - MIN_Y
+    };
+
+    var minQuadSize = [
+      boundaries.width / Math.pow(2, 12),
+      boundaries.height / Math.pow(2, 12)
+    ];
+
+    var maxQuadSize = [
+      boundaries.width / Math.pow(2, 9),
+      boundaries.height / Math.pow(2, 9)
+    ];
+
+    var tree = QuadTree.fromPoints(POINTS, {
+      threshold: THRESHOLD,
+      boundaries: boundaries,
+      minQuadSize: minQuadSize,
+      maxQuadSize: maxQuadSize
     });
 
     console.log(tree);
