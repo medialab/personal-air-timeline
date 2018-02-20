@@ -99,7 +99,7 @@ h3.script-title {
           transition: background-color .2s;
 }
 .upload-area-container:hover .upload-area, .upload-area-container.over .upload-area{
-  background-color: #53aaea;
+  background-color: #a8c3d6;
 }
 .upload-area-container.loading .upload-area{
   background-color: #46b8da;
