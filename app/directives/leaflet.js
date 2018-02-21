@@ -57,7 +57,8 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
       $scope.data.forEach(function(d) {
         var marker = Leaflet.circleMarker([d.y, d.x], {
           radius: 3,
-          fillOpacity: 1
+          fillOpacity: 1,
+          color: 'steelblue'
         });
 
         marker.addTo($scope.map);

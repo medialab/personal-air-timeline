@@ -176,6 +176,7 @@ config(['$routeProvider', function($routeProvider) {
                 .attr("text-anchor", "end")
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "12px")
+                .attr("color", "steelblue")
             
           }
         })

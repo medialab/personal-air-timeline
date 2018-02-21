@@ -1,14 +1,10 @@
 <md-card md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
   <md-card-title>
     <md-card-title-text>
-      <span class="md-headline">Timeline summary</span>
-      <span class="md-subhead">Hour per hour summary data summary</span>
+      <span class="md-headline">Data summary</span>
+      <!-- <span class="md-subhead">Hour per hour summary data summary</span> -->
     </md-card-title-text>
   </md-card-title>
-  <!-- <md-card-actions layout="row" layout-align="end center">
-    <md-button>Action 1</md-button>
-    <md-button>Action 2</md-button>
-  </md-card-actions>-->
   <md-card-content>
     <div layout-fill layout="column">
       <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'T'" title="'Temperature'"></condensed-curve>
