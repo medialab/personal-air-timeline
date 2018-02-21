@@ -4,9 +4,6 @@
       <span class="md-headline">Timeline summary</span>
       <span class="md-subhead">Hour per hour summary data summary</span>
     </md-card-title-text>
-    <md-card-title-media>
-      <div class="md-media-lg card-media vis-container"></div>
-    </md-card-title-media>
   </md-card-title>
   <!-- <md-card-actions layout="row" layout-align="end center">
     <md-button>Action 1</md-button>
@@ -14,14 +11,15 @@
   </md-card-actions>-->
   <md-card-content>
     <div layout-fill layout="column">
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'T'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'RH'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'PM25'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'PM10'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'DCE_PM25'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'DCE_PM10'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'x'"></condensed-curve>
-      <condensed-curve style="height: 120px;" timeline-data="timelineData" accessor="'y'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'T'" title="'Temperature'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'RH'"  title="'Humidity'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'PM25'"  title="'Particulate Matter PM2.5'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'PM10'"  title="'Particulate Matter PM10'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'y'"  title="'Latitude'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'x'"  title="'Longitude'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'DCE_PM25'"  title="'Modelled avg. PM2.5 at LatLng'"></condensed-curve>
+      <condensed-curve style="height: 32px;" timeline-data="timelineData" accessor="'DCE_PM10'"  title="'Modelled avg. PM10 at LatLng'"></condensed-curve>
+      <condensed-curve style="height: 32px;" scale="true"></condensed-curve>
     </div>
   </md-card-content>
 </md-card>

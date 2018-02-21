@@ -96,6 +96,7 @@ config(['$routeProvider', function($routeProvider) {
     scope: {
       timelineData: '=',
       accessor: '=',
+      title: '=',
       scale: '='
     },
     link: function($scope, el, attrs) {
@@ -111,11 +112,10 @@ config(['$routeProvider', function($routeProvider) {
 
       function redraw(){
         $timeout(function(){
-          console.log($scope.accessor)
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 6, right: 12, bottom: 30, left: 150};
+          var margin = {top: 3, right: 0, bottom: 3, left: 200};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
@@ -137,31 +137,47 @@ config(['$routeProvider', function($routeProvider) {
           var x = d3.scaleTime()
               .rangeRound([0, width])
 
-          var y = d3.scaleLinear()
-              .rangeRound([height, 0])
+          if ($scope.scale) {
+            
+            // Only display the axis
+            g.append("g")
+                // .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+              // .select(".domain")
+              //   .remove();
 
-          var line = d3.line()
-              .defined(function(d) { return y(d[$scope.accessor]) && d.def})
-              .x(function(d) { return x(d.timestamp); })
-              .y(function(d) { return y(d[$scope.accessor]); })
+          } else {
 
-          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
-          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+            // Only display the data
+            var y = d3.scaleLinear()
+                .rangeRound([height, 0])
 
-          g.append("g")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(x))
-            .select(".domain")
-              .remove();
+            var line = d3.line()
+                .defined(function(d) { return y(d[$scope.accessor]) && d.def})
+                .x(function(d) { return x(d.timestamp); })
+                .y(function(d) { return y(d[$scope.accessor]); })
 
-          g.append("path")
-              .datum($scope.timelineData)
-              .attr("fill", "none")
-              .attr("stroke", "steelblue")
-              .attr("stroke-linejoin", "round")
-              .attr("stroke-linecap", "round")
-              .attr("stroke-width", 1.5)
-              .attr("d", line);
+            x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+            y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+            g.append("path")
+                .datum($scope.timelineData)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", line);
+
+            g.append("text")
+                .attr('x', -6)
+                .attr('y', 18)
+                .text($scope.title)
+                .attr("text-anchor", "end")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "12px")
+            
+          }
         })
       }
     }
