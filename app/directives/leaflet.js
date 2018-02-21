@@ -15,7 +15,7 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
         zoom: 6
       });
 
-      Leaflet.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      Leaflet.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
         attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo($scope.map);
