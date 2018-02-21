@@ -2,6 +2,22 @@
 
 var graphology = require('graphology');
 var gexf = require('graphology-gexf/browser');
+var QuadTree = require('../../scripts/quad-tree.js');
+
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
 
 angular.module('saveourair.view_upload', ['ngRoute'])
 
@@ -20,11 +36,35 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\n> Multiple files allowed'
 
+  $scope.pm10tree
+  $scope.pm25tree
+  $scope.pendingReconcile
+
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
   $scope.$watch('sensorFiles', updateUploads, true)
   $scope.$watch('timelineFiles', updateUploads, true)
+
+  // Load pm files
+  d3.text('./data/quad-tree-pm10.csv', function(data){
+    var lines = d3.csvParseRows(data);
+
+    $scope.pm10tree = QuadTree.fromCSV(lines);
+
+    if ($scope.pm25tree && $scope.pendingReconcile) {
+      finalizeReconciling()
+    }
+  })
+  d3.text('./data/quad-tree-pm25.csv', function(data){
+    var lines = d3.csvParseRows(data);
+
+    $scope.pm25tree = QuadTree.fromCSV(lines);
+
+    if ($scope.pm10tree && $scope.pendingReconcile) {
+      finalizeReconciling()
+    }
+  })
 
   function updateUploads() {
     var someTimelineFiles = Object.keys($scope.timelineFiles).length > 0
@@ -32,9 +72,13 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     var data = {}
     if (someSensorFiles && someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data ............ OK\n>>>>>>>>>>>>>>>>>> DATA READY\n\nNote: You may upload\n      additional files'
-      $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles)
-      store.set('reconciledData', $scope.reconciledData)
-      window.D = $scope.reconciledData
+
+      if ($scope.pm10tree && $scope.pm25tree) {
+        finalizeReconciling()
+      } else {
+        $scope.pendingReconcile = true
+      }
+
     } else if (someSensorFiles && !someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data > PLEASE UPLOAD'
     } else if (!someSensorFiles && someTimelineFiles) {
@@ -43,6 +87,15 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
     store.set('data', data)
   }
+
+  var finalizeReconciling = function finalizeReconciling() {
+    $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
+    store.set('reconciledData', $scope.reconciledData)
+    window.D = $scope.reconciledData
+    $scope.pendingReconcile = false
+  }
+
+  finalizeReconciling = debounce(finalizeReconciling, 500);
 
   $scope.download = function() {
     var blob = new Blob([d3.csvFormat(D)], {'type':'text/csv;charset=utf-8'});
@@ -241,7 +294,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     return datapoints
   }
 
-  function reconcileFiles(sensorfiles, timelinefiles) {
+  function reconcileFiles(sensorfiles, timelinefiles, pm25tree, pm10tree) {
     var fileName
 
     /// Build spatial index
@@ -308,7 +361,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             // Interval is a point
             timestampsIndex[interval.beginTimestamp] = timestampsIndex[interval.beginTimestamp] || {ts:interval.beginTimestamp}
             timestampsIndex[interval.beginTimestamp].after = interval.path.split(',').map(function(d){return +d})
-            
+
             timestampsIndex[interval.endTimestamp] = timestampsIndex[interval.endTimestamp] || {ts:interval.endTimestamp}
             timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
           } else {
@@ -334,7 +387,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
               // It's actually a point!
               timestampsIndex[interval.beginTimestamp] = timestampsIndex[interval.beginTimestamp] || {ts:interval.beginTimestamp}
               timestampsIndex[interval.beginTimestamp].after = interval.path.split(',').map(function(d){return +d})
-              
+
               timestampsIndex[interval.endTimestamp] = timestampsIndex[interval.endTimestamp] || {ts:interval.endTimestamp}
               timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
             } else {
@@ -342,7 +395,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
               timestampsIndex[interval.beginTimestamp] = timestampsIndex[interval.beginTimestamp] || {ts:interval.beginTimestamp}
               timestampsIndex[interval.beginTimestamp].after = interval.path.split(',').map(function(d){return +d})
-              
+
               coordinatesList.forEach(function(c, i){
                 var ratio = ratios[i]
                 var ts = interval.beginTimestamp + ratio * (interval.endTimestamp - interval.beginTimestamp)
@@ -426,7 +479,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         }
       })
     }
-    return Object.values(datapoints).map(function(d){
+    var finalData = Object.values(datapoints).map(function(d){
       var coordinates = d.coordinates
       delete d.coordinates
       if (coordinates) {
@@ -435,6 +488,20 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       }
       return d
     })
+
+    // Retrieving data from both quadtrees
+    finalData.forEach(function(d){
+      if (!d.x || !d.y)
+        return;
+
+      var pm25 = pm25tree.get(d.y, d.x)
+      var pm10 = pm10tree.get(d.y, d.x)
+
+      d.DCE_PM25 = pm25 || ''
+      d.DCE_PM10 = pm10 || ''
+    })
+
+    return finalData
   }
 
   function parseXml(xmlStr) {

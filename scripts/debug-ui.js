@@ -7,10 +7,12 @@
 import * as d3 from 'd3';
 import QuadTree from './quad-tree';
 
-const canvas = document.getElementById('canvas'),
-      context = canvas.getContext('2d');
+const canvasLeft = document.getElementById('canvas-left'),
+      canvasRight = document.getElementById('canvas-right');
 
-function render(tree) {
+function render(canvas, tree) {
+  const context = canvas.getContext('2d');
+
   let width = canvas.offsetWidth,
       height = canvas.offsetHeight;
 
@@ -74,11 +76,22 @@ function render(tree) {
   context.putImageData(img, 0, 0);
 }
 
-d3.text('./scripts/quad-tree.csv', csv => {
-  const lines = d3.csvParseRows(csv);
+function textPromise(path) {
+  return new Promise(function(resolve) {
+    d3.text(path, csv => {
+      return resolve(d3.csvParseRows(csv));
+    });
+  });
+}
 
-  const tree = QuadTree.fromCSV(lines);
-  window.tree = tree;
+Promise.all([
+  textPromise('./scripts/quad-tree-pm25.csv'),
+  textPromise('./scripts/quad-tree-pm10.csv')
+]).then(([pm25, pm10]) => {
 
-  render(tree);
+  const treePm25 = QuadTree.fromCSV(pm25),
+        treePm10 = QuadTree.fromCSV(pm10);
+
+  render(canvasLeft, treePm25);
+  render(canvasRight, treePm10);
 });

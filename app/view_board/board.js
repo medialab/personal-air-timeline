@@ -14,7 +14,18 @@ angular.module('saveourair.view_board', ['ngRoute'])
 
 .controller('BoardCtrl', ['$scope', '$timeout', '$location'
   ,function(               $scope ,  $timeout ,  $location) {
-  	$timeout(function(){
+  	$scope.loading = true
+		d3.csv('data/test.csv', renderData)
+
+  	function renderData(data){
+  		$timeout(function(){
+  			$scope.loading = false
+  			console.log('data', data)
+  			$scope.timelineData = data
+  		})
+  	}
+
+  	/*$timeout(function(){
       $location.url('/upload')
-    }, 0)
+    }, 0)*/
 }]);

@@ -8,10 +8,20 @@
         width: 100%;
         height: 100%;
       }
+
+      #canvas-left, #canvas-right {
+        position: absolute;
+        width: 50%;
+      }
+
+      #canvas-right {
+        left: 50%;
+      }
     </style>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas-left"></canvas>
+    <canvas id="canvas-right"></canvas>
     <script src="./build/bundle.js"></script>
   </body>
 </html>

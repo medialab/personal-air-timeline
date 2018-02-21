@@ -5,7 +5,8 @@
  * Custom QuadTree data structure aiming at grouping the given point based
  * on some value.
  */
-var Stack = require('mnemonist/stack');
+var Stack = require('mnemonist/stack'),
+    coords = require('./coordinates.js');
 
 function Quad(x, y, width, height) {
   this.mu = 0;
@@ -28,6 +29,43 @@ function QuadTree() {
   this.root = new Quad();
 }
 
+QuadTree.prototype.get = function(lat, lon) {
+  var qr = coords.fromLatLonToQuad(lat, lon),
+      x = qr[0],
+      y = qr[1];
+
+  var quad = this.root;
+
+  while (!quad.leaf) {
+
+    // Finding correct quadrant
+    if (x < (quad.x + quad.width / 2)) {
+      if (y < (quad.y + quad.height / 2)) {
+        quad = quad.quads[0];
+      }
+      else {
+        quad = quad.quads[2];
+      }
+    }
+    else {
+      if (y < (quad.y + quad.height / 2)) {
+        quad = quad.quads[1];
+      }
+      else {
+        quad = quad.quads[3];
+      }
+    }
+
+    if (!quad)
+      return;
+  }
+
+  if (!quad.leaf)
+    return;
+
+  return quad.mu;
+};
+
 QuadTree.prototype.forEachLeaf = function(callback) {
   var stack = Stack.from([this.root]),
       quad;
@@ -35,8 +73,10 @@ QuadTree.prototype.forEachLeaf = function(callback) {
   while (stack.size) {
     quad = stack.pop();
 
-    if (quad.leaf)
+    if (quad.leaf) {
       callback(quad);
+      continue;
+    }
 
     if (quad.quads[3])
       stack.push(quad.quads[3]);
@@ -216,6 +256,7 @@ QuadTree.fromPoints = function(points, params) {
       parent,
       quadIndex,
       quad,
+      value,
       minValue,
       maxValue,
       minX,
@@ -242,11 +283,12 @@ QuadTree.fromPoints = function(points, params) {
 
     for (i = 0, l = points.length; i < l; i++) {
       point = points[i];
+      value = point[params.value];
 
-      if (point.value < minValue)
-        minValue = point.value;
-      if (point.value > maxValue)
-        maxValue = point.value;
+      if (value < minValue)
+        minValue = value;
+      if (value > maxValue)
+        maxValue = value;
 
       if (point.x < minX)
         minX = point.x;
@@ -258,7 +300,7 @@ QuadTree.fromPoints = function(points, params) {
       if (point.y > maxY)
         maxY = point.y;
 
-      mu += point.value;
+      mu += value;
     }
 
     mu /= points.length;
