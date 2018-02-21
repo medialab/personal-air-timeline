@@ -73,7 +73,17 @@ config(['$routeProvider', function($routeProvider) {
 .directive('timelineSummaryCard', function($timeout){
   return {
     restrict: 'E',
-    templateUrl: 'view_board/timelineSummaryCard.html',
+    templateUrl: 'directives/timelineSummaryCard.html',
+    scope: {
+      timelineData: '='
+    }
+  }
+})
+
+.directive('leafletCard', function($timeout){
+  return {
+    restrict: 'E',
+    templateUrl: 'directives/leafletCard.html',
     scope: {
       timelineData: '='
     }
