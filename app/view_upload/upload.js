@@ -20,11 +20,31 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.timelineLoadingMessage = ''
   $scope.uploadStatusMessage = 'PLEASE UPLOAD YOUR DATA\n> Multiple files allowed'
 
+  $scope.pm10data
+  $scope.pm25data
+  $scope.pendingReconcile
+
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
   $scope.$watch('sensorFiles', updateUploads, true)
   $scope.$watch('timelineFiles', updateUploads, true)
+
+  // Load pm files
+  d3.text('pm10', function(data){
+    $scope.pm10data = data
+
+    if ($scope.pm25data && $scope.pendingReconcile) {
+      finalizeReconciling()
+    }
+  })
+  d3.text('pm25', function(data){
+    $scope.pm25data = data
+
+    if ($scope.pm10data && $scope.pendingReconcile) {
+      finalizeReconciling()
+    }
+  })
 
   function updateUploads() {
     var someTimelineFiles = Object.keys($scope.timelineFiles).length > 0
@@ -32,9 +52,13 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     var data = {}
     if (someSensorFiles && someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data ............ OK\n>>>>>>>>>>>>>>>>>> DATA READY\n\nNote: You may upload\n      additional files'
-      $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles)
-      store.set('reconciledData', $scope.reconciledData)
-      window.D = $scope.reconciledData
+
+      if ($scope.pm10data && $scope.pm25data) {
+        finalizeReconciling()
+      } else {
+        $scope.pendingReconcile = true
+      }
+      
     } else if (someSensorFiles && !someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data > PLEASE UPLOAD'
     } else if (!someSensorFiles && someTimelineFiles) {
@@ -42,6 +66,13 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     }
 
     store.set('data', data)
+  }
+
+  function finalizeReconciling() {
+    $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25data, $scope.pm10data)
+    store.set('reconciledData', $scope.reconciledData)
+    window.D = $scope.reconciledData
+    $scope.pendingReconcile = false
   }
 
   $scope.download = function() {
