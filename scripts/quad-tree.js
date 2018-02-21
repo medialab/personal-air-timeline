@@ -31,12 +31,12 @@ function QuadTree() {
 
 QuadTree.prototype.get = function(lat, lon) {
   var qr = coords.fromLatLonToQuad(lat, lon),
-      x = qr.x,
-      y = qr.y;
+      x = qr[0],
+      y = qr[1];
 
   var quad = this.root;
 
-  while (quad.leaf) {
+  while (!quad.leaf) {
 
     // Finding correct quadrant
     if (x < (quad.x + quad.width / 2)) {
@@ -59,6 +59,9 @@ QuadTree.prototype.get = function(lat, lon) {
     if (!quad)
       return;
   }
+
+  if (!quad.leaf)
+    return;
 
   return quad.mu;
 };
