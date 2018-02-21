@@ -33,6 +33,7 @@ window.louvain = require('graphology-communities-louvain');
 window.Sigma = require('sigma/endpoint');
 
 // Requiring own modules
+require('./directives/leaflet.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
 
