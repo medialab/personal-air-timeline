@@ -42,6 +42,7 @@ angular.module('saveourair', [
   'ngRoute',
   'ngSanitize',
   'ngMaterial',
+  'saveourair.directives.leaflet',
   'saveourair.view_upload',
   'saveourair.view_board'
 ]).
