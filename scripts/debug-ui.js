@@ -76,18 +76,22 @@ function render(canvas, tree) {
   context.putImageData(img, 0, 0);
 }
 
-d3.text('./scripts/quad-tree-pm25.csv', csv => {
-  const lines = d3.csvParseRows(csv);
+function textPromise(path) {
+  return new Promise(function(resolve) {
+    d3.text(path, csv => {
+      return resolve(d3.csvParseRows(csv));
+    });
+  });
+}
 
-  const treePm25 = QuadTree.fromCSV(lines);
+Promise.all([
+  textPromise('./scripts/quad-tree-pm25.csv'),
+  textPromise('./scripts/quad-tree-pm10.csv')
+]).then(([pm25, pm10]) => {
+
+  const treePm25 = QuadTree.fromCSV(pm25),
+        treePm10 = QuadTree.fromCSV(pm10);
 
   render(canvasLeft, treePm25);
-});
-
-d3.text('./scripts/quad-tree-pm10.csv', csv => {
-  const lines = d3.csvParseRows(csv);
-
-  const treePm10 = QuadTree.fromCSV(lines);
-
   render(canvasRight, treePm10);
 });
