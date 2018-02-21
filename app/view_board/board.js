@@ -20,7 +20,8 @@ angular.module('saveourair.view_board', ['ngRoute'])
   	function renderData(data){
   		$timeout(function(){
   			$scope.loading = false
-  			console.log(data)
+  			console.log('data', data)
+  			$scope.timelineData = data
   		})
   	}
 
