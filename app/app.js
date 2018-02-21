@@ -51,11 +51,11 @@ config(['$routeProvider', function($routeProvider) {
 }])
 
 // Filters
-.filter('number', function() {
+/*.filter('number', function() {
   return function(d) {
     return +d
   }
-})
+})*/
 .filter('percent', function() {
   return function(d) {
     return Math.round(+d*100)+'%'
@@ -115,7 +115,7 @@ config(['$routeProvider', function($routeProvider) {
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 3, right: 0, bottom: 3, left: 200};
+          var margin = {top: 6, right: 0, bottom: 6, left: 200};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
@@ -150,7 +150,7 @@ config(['$routeProvider', function($routeProvider) {
 
             // Only display the data
             var y = d3.scaleLinear()
-                .rangeRound([height, 0])
+                .range([height, 0])
 
             var line = d3.line()
                 .defined(function(d) { return y(d[$scope.accessor]) && d.def})
@@ -176,7 +176,7 @@ config(['$routeProvider', function($routeProvider) {
                 .attr("text-anchor", "end")
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "12px")
-                .attr("color", "steelblue")
+                .attr("fill", "steelblue")
             
           }
         })

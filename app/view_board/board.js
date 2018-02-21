@@ -37,6 +37,7 @@ angular.module('saveourair.view_board', ['ngRoute'])
         d_prev = d
         d.def = defined
   		})
+  		
 
   		$timeout(function(){
   			$scope.loading = false
