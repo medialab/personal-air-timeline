@@ -15,7 +15,7 @@ angular.module('saveourair.view_board', ['ngRoute'])
 .controller('BoardCtrl', ['$scope', '$timeout', '$location'
   ,function(               $scope ,  $timeout ,  $location) {
   	$scope.loading = true
-		d3.csv('test.csv', renderData)
+		d3.csv('data/test.csv', renderData)
 
   	function renderData(data){
   		$timeout(function(){
