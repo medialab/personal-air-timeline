@@ -5,7 +5,8 @@
  * Custom QuadTree data structure aiming at grouping the given point based
  * on some value.
  */
-var Stack = require('mnemonist/stack');
+var Stack = require('mnemonist/stack'),
+    coords = require('./coordinates.js');
 
 function Quad(x, y, width, height) {
   this.mu = 0;
@@ -27,6 +28,40 @@ function QuadTree() {
   this.max = -Infinity;
   this.root = new Quad();
 }
+
+QuadTree.prototype.get = function(lat, lon) {
+  var qr = coords.fromLatLonToQuad(lat, lon),
+      x = qr.x,
+      y = qr.y;
+
+  var quad = this.root;
+
+  while (quad.leaf) {
+
+    // Finding correct quadrant
+    if (x < (quad.x + quad.width / 2)) {
+      if (y < (quad.y + quad.height / 2)) {
+        quad = quad.quads[0];
+      }
+      else {
+        quad = quad.quads[2];
+      }
+    }
+    else {
+      if (y < (quad.y + quad.height / 2)) {
+        quad = quad.quads[1];
+      }
+      else {
+        quad = quad.quads[3];
+      }
+    }
+
+    if (!quad)
+      return;
+  }
+
+  return quad.mu;
+};
 
 QuadTree.prototype.forEachLeaf = function(callback) {
   var stack = Stack.from([this.root]),
