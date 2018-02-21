@@ -32,7 +32,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     var data = {}
     if (someSensorFiles && someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data ............ OK\n>>>>>>>>>>>>>>>>>> DATA READY\n\nNote: You may upload\n      additional files'
-      data = reconcileFiles($scope.sensorFiles, $scope.timelineFiles)
+      $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles)
+      store.set('reconciledData', $scope.reconciledData)
+      window.D = $scope.reconciledData
     } else if (someSensorFiles && !someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data > PLEASE UPLOAD'
     } else if (!someSensorFiles && someTimelineFiles) {
@@ -40,6 +42,11 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     }
 
     store.set('data', data)
+  }
+
+  $scope.download = function() {
+    var blob = new Blob([d3.csvFormat(D)], {'type':'text/csv;charset=utf-8'});
+    saveAs(blob, "Personal Air Timeline.csv");
   }
 
   // File loading interactions
@@ -419,7 +426,15 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         }
       })
     }
-    return Object.values(datapoints)
+    return Object.values(datapoints).map(function(d){
+      var coordinates = d.coordinates
+      delete d.coordinates
+      if (coordinates) {
+        d.x = coordinates[0]
+        d.y = coordinates[1]
+      }
+      return d
+    })
   }
 
   function parseXml(xmlStr) {

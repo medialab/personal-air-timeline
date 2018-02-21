@@ -100,17 +100,20 @@
       ng-if="(sensorFiles|keylength) > 0 && (timelineFiles|keylength) > 0"
     >
       <div layout="column" flex>
-        [MERGE: TODO]
+        <h3>
+          <md-icon>done</md-icon>
+          Data is merged
+        </h3>
       </div>
       <div layout="column">
-        <md-button class="md-raised md-primary">
+        <md-button class="md-raised md-primary" ng-click="download()">
           <md-icon>file_download</md-icon>
           Download
         </md-button>
-        <md-button class="md-raised">
+        <!-- <md-button class="md-raised">
           <md-icon>show_chart</md-icon>
           Preview
-        </md-button>
+        </md-button> -->
       </div>
     </div>
     <div
