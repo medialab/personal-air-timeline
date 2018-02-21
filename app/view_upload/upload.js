@@ -291,8 +291,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       }
     })
 
-    console.log('DP', datapoints)
-
     return datapoints
   }
 
@@ -417,7 +415,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       })
 
       var timestamps = Object.values(timestampsIndex).sort(function(a, b) {return a.ts-b.ts})
-      console.log('timestamps', timestamps)
       var whereWasIAt = function(ts) {
         if (ts < timestamps[0].ts || ts>timestamps[timestamps.length - 1].ts) {
           return undefined
