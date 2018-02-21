@@ -366,7 +366,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
           } else {
             // Interval is a linestring
-            // console.log(interval)
+            // console.log('linestring', interval)
             var coordinatesList = interval.path.split(' ')
               .map(function(path){ return path.split(',').map(function(d){return +d}) })
               .filter(function(path){ return path.length >= 2 })
@@ -386,27 +386,27 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             if (totalDistance == 0) {
               // It's actually a point!
               timestampsIndex[interval.beginTimestamp] = timestampsIndex[interval.beginTimestamp] || {ts:interval.beginTimestamp}
-              timestampsIndex[interval.beginTimestamp].after = interval.path.split(',').map(function(d){return +d})
+              timestampsIndex[interval.beginTimestamp].after = coordinatesList[0]
 
               timestampsIndex[interval.endTimestamp] = timestampsIndex[interval.endTimestamp] || {ts:interval.endTimestamp}
-              timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
+              timestampsIndex[interval.endTimestamp].before = coordinatesList[0]
             } else {
               var ratios = cumulativeDistances.map(function(d){ return d/totalDistance })
 
               timestampsIndex[interval.beginTimestamp] = timestampsIndex[interval.beginTimestamp] || {ts:interval.beginTimestamp}
-              timestampsIndex[interval.beginTimestamp].after = interval.path.split(',').map(function(d){return +d})
+              timestampsIndex[interval.beginTimestamp].after = coordinatesList[0]
 
               coordinatesList.forEach(function(c, i){
                 var ratio = ratios[i]
                 var ts = interval.beginTimestamp + ratio * (interval.endTimestamp - interval.beginTimestamp)
-
+                
                 timestampsIndex[ts] = timestampsIndex[ts] || {ts:ts}
                 timestampsIndex[ts].before = c
                 timestampsIndex[ts].after = c
               })
 
               timestampsIndex[interval.endTimestamp] = timestampsIndex[interval.endTimestamp] || {ts:interval.endTimestamp}
-              timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
+              timestampsIndex[interval.endTimestamp].before = coordinatesList[coordinatesList.length-1]
             }
 
           }
