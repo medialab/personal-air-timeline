@@ -1,4 +1,12 @@
-<div layout="row" layout-fill >
-  TODO
+<!-- Loading -->
+<div layout="column" layout-fill ng-if="loading" layout-align="center center">
+  <md-progress-circular
+    md-diameter="42"
+    md-mode="indeterminate"
+  ></md-progress-circular>
 </div>
 
+<!-- Loaded -->
+<div layout="column" layout-fill layout-padding ng-if="!loading">
+	DATA LOADED
+</div>
