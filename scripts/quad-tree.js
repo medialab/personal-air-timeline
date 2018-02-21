@@ -35,8 +35,10 @@ QuadTree.prototype.forEachLeaf = function(callback) {
   while (stack.size) {
     quad = stack.pop();
 
-    if (quad.leaf)
+    if (quad.leaf) {
       callback(quad);
+      continue;
+    }
 
     if (quad.quads[3])
       stack.push(quad.quads[3]);
@@ -216,6 +218,7 @@ QuadTree.fromPoints = function(points, params) {
       parent,
       quadIndex,
       quad,
+      value,
       minValue,
       maxValue,
       minX,
@@ -242,11 +245,12 @@ QuadTree.fromPoints = function(points, params) {
 
     for (i = 0, l = points.length; i < l; i++) {
       point = points[i];
+      value = point[params.value];
 
-      if (point.value < minValue)
-        minValue = point.value;
-      if (point.value > maxValue)
-        maxValue = point.value;
+      if (value < minValue)
+        minValue = value;
+      if (value > maxValue)
+        maxValue = value;
 
       if (point.x < minX)
         minX = point.x;
@@ -258,7 +262,7 @@ QuadTree.fromPoints = function(points, params) {
       if (point.y > maxY)
         maxY = point.y;
 
-      mu += point.value;
+      mu += value;
     }
 
     mu /= points.length;
