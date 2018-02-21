@@ -68,43 +68,90 @@ config(['$routeProvider', function($routeProvider) {
 })
 
 // Directives (cards)
-.directive('timelineSummaryCard', [function(){
+.directive('timelineSummaryCard', function($timeout){
   return {
-    restrict: 'E'
-    ,templateUrl: 'view_board/timelineSummaryCard.html'
-    ,scope: {
+    restrict: 'E',
+    templateUrl: 'view_board/timelineSummaryCard.html',
+    scope: {
       timelineData: '='
     }
-    ,link: function($scope, el, attrs) {
-      $scope.$watch('statusList', redraw, true)
+  }
+})
+
+.directive('condensedCurve', function($timeout){
+  return {
+    restrict: 'E',
+    scope: {
+      timelineData: '=',
+      accessor: '=',
+      scale: '='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('timelineData', redraw, true)
+      // $scope.$watch('accessor', redraw, true)
+      // $scope.$watch('scale', redraw, true)
       window.addEventListener('resize', redraw)
       $scope.$on('$destroy', function(){
         window.removeEventListener('resize', redraw)
       })
 
-      window.el = el
+      var container = el
 
       function redraw(){
-        /*$timeout(function(){
+        $timeout(function(){
+          console.log($scope.accessor)
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 2, right: 0, bottom: 0, left: 0};
+          var margin = {top: 6, right: 12, bottom: 30, left: 150};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
-          // While loading redraw may trigger before element being properly sized
+          // // While loading redraw may trigger before element being properly sized
           if (width <= 0 || height <= 0) {
             $timeout(redraw, 250)
             return
           }
 
-          // Setup: scales
-          var x = d3.scaleLinear()
-            .domain([0, $scope.statusListSize-1])
-            .range([0, width])
-        }*/
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var x = d3.scaleTime()
+              .rangeRound([0, width])
+
+          var y = d3.scaleLinear()
+              .rangeRound([height, 0])
+
+          var line = d3.line()
+              .defined(function(d) { return y(d[$scope.accessor]) && d.def})
+              .x(function(d) { return x(d.timestamp); })
+              .y(function(d) { return y(d[$scope.accessor]); })
+
+          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+          g.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x))
+            .select(".domain")
+              .remove();
+
+          g.append("path")
+              .datum($scope.timelineData)
+              .attr("fill", "none")
+              .attr("stroke", "steelblue")
+              .attr("stroke-linejoin", "round")
+              .attr("stroke-linecap", "round")
+              .attr("stroke-width", 1.5)
+              .attr("d", line);
+        })
       }
     }
   }
-}])
+})
