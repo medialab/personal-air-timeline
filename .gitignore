@@ -51,7 +51,6 @@ Temporary Items
 
 # Bundled JS
 package-lock.json
-app/bundle.js
 
 # Sensible data
 scripts/DATA
