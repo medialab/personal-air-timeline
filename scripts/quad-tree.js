@@ -36,7 +36,7 @@ QuadTree.prototype.get = function(lat, lon) {
 
   var quad = this.root;
 
-  while (quad.leaf) {
+  while (!quad.leaf) {
 
     // Finding correct quadrant
     if (x < (quad.x + quad.width / 2)) {
@@ -59,6 +59,9 @@ QuadTree.prototype.get = function(lat, lon) {
     if (!quad)
       return;
   }
+
+  if (!quad.leaf)
+    return;
 
   return quad.mu;
 };

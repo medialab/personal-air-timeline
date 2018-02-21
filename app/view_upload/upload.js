@@ -4,6 +4,21 @@ var graphology = require('graphology');
 var gexf = require('graphology-gexf/browser');
 var QuadTree = require('../../scripts/quad-tree.js');
 
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 angular.module('saveourair.view_upload', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
@@ -73,12 +88,14 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     store.set('data', data)
   }
 
-  function finalizeReconciling() {
+  var finalizeReconciling = function finalizeReconciling() {
     $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
     store.set('reconciledData', $scope.reconciledData)
     window.D = $scope.reconciledData
     $scope.pendingReconcile = false
   }
+
+  finalizeReconciling = debounce(finalizeReconciling, 500);
 
   $scope.download = function() {
     var blob = new Blob([d3.csvFormat(D)], {'type':'text/csv;charset=utf-8'});
@@ -474,6 +491,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
     // Retrieving data from both quadtrees
     finalData.forEach(function(d){
+      if (!d.x || !d.y)
+        return;
+
       var pm25 = pm25tree.get(d.y, d.x)
       var pm10 = pm10tree.get(d.y, d.x)
 
