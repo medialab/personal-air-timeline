@@ -60,10 +60,23 @@ config(['$routeProvider', function($routeProvider) {
   }
 })
 
-// Service
+// Services
 .factory('cache', function(){
   var ns = {}
   ns.recipes = {}
   return ns
 })
 
+// Directives (cards)
+.directive('timelineSummaryCard', [function(){
+  return {
+    restrict: 'E'
+    ,templateUrl: 'view_board/timelineSummaryCard.html'
+    ,scope: {
+      timelineData: '='
+    }
+    ,link: function(scope, el, attrs) {
+      console.log('haha')
+    }
+  }
+}])
