@@ -29,6 +29,8 @@ angular.module('saveourair.view_board', ['ngRoute'])
   			d.P = +d.P
   			d.PM25 = +d.PM25
   			d.PM10 = +d.PM10
+  			d.DCE_PM25 = +d.DCE_PM25 || undefined
+  			d.DCE_PM10 = +d.DCE_PM10 || undefined
   			d.x = +d.x || undefined
   			d.y = +d.y || undefined
         var defined = d_prev && d.timestamp - d_prev.timestamp < fiveminutesms
