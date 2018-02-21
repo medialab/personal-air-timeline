@@ -31,8 +31,8 @@ function QuadTree() {
 
 QuadTree.prototype.get = function(lat, lon) {
   var qr = coords.fromLatLonToQuad(lat, lon),
-      x = qr.x,
-      y = qr.y;
+      x = qr[0],
+      y = qr[1];
 
   var quad = this.root;
 
