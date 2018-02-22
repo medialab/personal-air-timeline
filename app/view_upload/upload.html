@@ -99,13 +99,19 @@
       class="fancy-text content"
       ng-if="(sensorFiles|keylength) > 0 && (timelineFiles|keylength) > 0"
     >
-      <div layout="column" flex>
+      <div layout="column" layout-fill ng-if="!reconciledData" layout-align="center center">
+        <md-progress-circular
+          md-diameter="42"
+          md-mode="indeterminate"
+        ></md-progress-circular>
+      </div>
+      <div layout="column" flex ng-if="reconciledData">
         <h3>
           <md-icon>done</md-icon>
           Data is merged
         </h3>
       </div>
-      <div layout="column">
+      <div layout="column" ng-if="reconciledData">
         <md-button class="md-raised md-primary" ng-click="download()">
           <md-icon>file_download</md-icon>
           Download
