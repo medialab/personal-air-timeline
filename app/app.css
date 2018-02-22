@@ -213,3 +213,11 @@ h3.script-title {
   size: 210mm 297mm;
   margin: 18mm 18mm 18mm 18mm;
 }
+
+/* Tune leaflet canvas */
+leaflet-canvas .leaflet-tile-pane .leaflet-layer{
+  opacity: 0.2 !important;
+}
+leaflet-canvas .leaflet-container{
+  background-color: #FFF !important;
+}
