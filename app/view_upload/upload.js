@@ -489,7 +489,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         d.y = coordinates[1]
       }
       return d
-    })
+    }).sort(function(a, b) {return a.timestamp-b.timestamp})
 
     /// Retrieving data from both quadtrees
     finalData.forEach(function(d){
@@ -504,15 +504,15 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     })
 
     /// Additional stuff
-    var movementThresholdMeters = 50
+    /*var movementThresholdMeters = 50
     finalData.forEach(function(d, i){
       if (i>0) {
         var d_meters = haversine(d, finalData[i-1])
         var instant_speed_mps = d_meters / ((d.timestamp - finalData[i-1].timestamp) / 1000)
         var instant_speed_kph = 3600 * instant_speed_mps / 1000
-        console.log(Math.round(instant_speed_kph * 100)/100)
+        // console.log(Math.round(instant_speed_kph * 100)/100)
       }
-    })
+    })*/
 
     return finalData
   }
