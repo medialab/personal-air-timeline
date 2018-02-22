@@ -18,8 +18,8 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       var centralTimestamp = 1518909277000 + 60*60*1000;
       $scope.start = centralTimestamp - 300*60*1000
       $scope.end = centralTimestamp + 300*60*1000
-      $scope.startDate = shortFormatDate(new Date($scope.start))
-      $scope.endDate = shortFormatDate(new Date($scope.end))
+      $scope.startDate = titleFormatDate(new Date($scope.start))
+      $scope.endDate = titleFormatDate(new Date($scope.end))
   		
       // DEV MODE: load test data
 			d3.csv('data/test.csv', renderData)
@@ -48,19 +48,22 @@ angular.module('saveourair.view_focus', ['ngRoute'])
   	}
 
     //
-    function shortFormatDate(date) {
+    function titleFormatDate(date) {
       var monthNames = [
-        "January", "February", "March",
+        "Jan", "Feb", "March",
         "April", "May", "June", "July",
-        "August", "September", "October",
-        "November", "December"
+        "Aug", "Sept", "Oct",
+        "Nov", "Dec"
       ];
 
       var day = date.getDate();
       var monthIndex = date.getMonth();
       var year = date.getFullYear();
 
-      return day + ' ' + monthNames[monthIndex] + ' ' + year;
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+
+      return day + ' ' + monthNames[monthIndex] + ' ' + year + ' ' + hours + ':' + minutes;
     }
 
 });

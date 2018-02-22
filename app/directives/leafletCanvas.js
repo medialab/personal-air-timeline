@@ -40,7 +40,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           var canvas = Leaflet.DomUtil.create('canvas');
           var mapSize = map.getSize();
 
-          var pixelRatio = 2;
+          var pixelRatio = 4;
 
           canvas.width = mapSize.x * pixelRatio;
           canvas.height = mapSize.y * pixelRatio;
@@ -95,7 +95,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             // Rotation jitter
             var angle = (2*Math.PI*d.timestamp/300000)%(2*Math.PI) // One turn every 5 minutes
-            jitter = 15 * Math.sqrt(timeThere/timeForATurn) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
+            jitter = 24 * Math.sqrt(timeThere/timeForATurn) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
             
             d_canvas.x += jitter * Math.cos(angle) + 0.2 * randomDeviation
             d_canvas.y += jitter * Math.sin(angle) + 0.2 * randomDeviation2
@@ -103,7 +103,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
             if (d.def && lastPosition) {
               // Opacity: smoothe out when close to the time boundaries
               var opacity = Math.min(Math.min(Math.abs(data[0].timestamp - d.timestamp), Math.abs(data[data.length-1].timestamp - d.timestamp)) / timeForATurn, 1)
-              opacity = Math.round(0.8 * opacity * 1000)/1000
+              opacity = Math.round(opacity * 1000)/1000
 
               // Pen
               pen.x = inertia * (pen.x||d_canvas.x) + (1-inertia) * d_canvas.x
@@ -111,7 +111,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
               // Draw
               ctx.beginPath()
-              ctx.lineWidth = 4 - Math.min(3, d.smoothedspeed / 15)
+              ctx.lineWidth = 5 - Math.min(4, d.smoothedspeed / 15)
               ctx.moveTo(lastPosition.x, lastPosition.y)
               ctx.lineTo(pen.x, pen.y)
               ctx.strokeStyle = 'rgba(0, 0, 0, ' + opacity + ')'
