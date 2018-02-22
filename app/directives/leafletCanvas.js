@@ -57,23 +57,75 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
             return result
           };
 
-          // Faire des gigi avec des gugu
           var ctx = canvas.getContext('2d')
-          var lastD
-          data.forEach(function(d){
-            if (d.def && lastD) {
-              // Transformation
-              var d_canvas = pos(d)
-              var lastD_canvas = pos(lastD)
+          ctx.lineCap="round"
+
+          var lastPosition
+          var lastStaticPosition
+          var lastStaticPositionThreshold = 10
+          var timeForATurn = 5*60*1000 // Five minutes
+          var jitter
+          var inertia = 0.9
+          var randomDeviation = 0
+          var randomDeviation2 = 0
+          var pen = {x:undefined, y:undefined}
+
+          data.forEach(function(d, i){
+
+            var d_canvas = pos(d)
+
+            // Distance to last static position
+            var timeThere
+            if (lastStaticPosition) {
+              var dist = Math.sqrt(Math.pow(lastStaticPosition.x - d_canvas.x, 2) + Math.pow(lastStaticPosition.x - d_canvas.x, 2))
+              if (dist < lastStaticPositionThreshold) {
+                // Still at the same place
+                timeThere = d.timestamp - lastStaticPosition.timestamp
+              } else {
+                // On the move!
+                lastStaticPosition = undefined
+                jitter = 0
+                timeThere = 0
+              }
+            }
+
+            // Update random deviation
+            randomDeviation  = 0.9 * randomDeviation  + (Math.random() - 0.5)
+            randomDeviation2 = 0.9 * randomDeviation2 + (Math.random() - 0.5)
+
+            // Rotation jitter
+            var angle = (2*Math.PI*d.timestamp/300000)%(2*Math.PI) // One turn every 5 minutes
+            jitter = 15 * Math.sqrt(timeThere/timeForATurn) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
+            
+            d_canvas.x += jitter * Math.cos(angle) + 0.2 * randomDeviation
+            d_canvas.y += jitter * Math.sin(angle) + 0.2 * randomDeviation2
+
+            if (d.def && lastPosition) {
+              // Opacity: smoothe out when close to the time boundaries
+              var opacity = Math.min(Math.min(Math.abs(data[0].timestamp - d.timestamp), Math.abs(data[data.length-1].timestamp - d.timestamp)) / timeForATurn, 1)
+              opacity = Math.round(0.8 * opacity * 1000)/1000
+
+              // Pen
+              pen.x = inertia * (pen.x||d_canvas.x) + (1-inertia) * d_canvas.x
+              pen.y = inertia * (pen.y||d_canvas.y) + (1-inertia) * d_canvas.y
 
               // Draw
               ctx.beginPath()
-              ctx.moveTo(lastD_canvas.x, lastD_canvas.y)
-              ctx.lineTo(d_canvas.x, d_canvas.y)
+              ctx.lineWidth = 4 - Math.min(3, d.smoothedspeed / 15)
+              ctx.moveTo(lastPosition.x, lastPosition.y)
+              ctx.lineTo(pen.x, pen.y)
+              ctx.strokeStyle = 'rgba(0, 0, 0, ' + opacity + ')'
               ctx.stroke()
+              ctx.fill()
 
             }
-            lastD = d
+
+            lastPosition = {x:pen.x, y:pen.y}
+
+            // Look at last static position
+            if (lastStaticPosition === undefined) {
+              lastStaticPosition = {x:d_canvas.x, y:d_canvas.y, timestamp:d.timestamp}
+            }
           })
         }
       });

@@ -16,8 +16,8 @@ angular.module('saveourair.view_focus', ['ngRoute'])
   		renderData(store.get('reconciledData'))
   	} else {
       var centralTimestamp = 1518909277000 + 60*60*1000;
-      $scope.start = centralTimestamp - 30*60*1000
-      $scope.end = centralTimestamp + 30*60*1000
+      $scope.start = centralTimestamp - 300*60*1000
+      $scope.end = centralTimestamp + 300*60*1000
       $scope.startDate = shortFormatDate(new Date($scope.start))
       $scope.endDate = shortFormatDate(new Date($scope.end))
   		
