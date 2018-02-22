@@ -54,7 +54,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
             return map.latLngToLayerPoint([point.y, point.x]);
           };
         }
-    });
+      });
 
       // Map initialization
       $scope.map = Leaflet.map(div, {
