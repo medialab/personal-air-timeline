@@ -156,6 +156,7 @@ config(['$routeProvider', function($routeProvider) {
       function redraw(){
         $timeout(function(){
           container.html('');
+          console.log('Draw', $scope.title)
 
           // Setup: dimensions
           var margin = {top: 6, right: 0, bottom: 6, left: 200};
