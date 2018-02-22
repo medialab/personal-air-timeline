@@ -34,6 +34,7 @@ window.Sigma = require('sigma/endpoint');
 
 // Requiring own modules
 require('./directives/leaflet.js');
+require('./directives/leafletCanvas.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
 require('./view_focus/focus.js');
@@ -44,6 +45,7 @@ angular.module('saveourair', [
   'ngSanitize',
   'ngMaterial',
   'saveourair.directives.leaflet',
+  'saveourair.directives.leafletCanvas',
   'saveourair.view_upload',
   'saveourair.view_board',
   'saveourair.view_focus'
@@ -141,7 +143,7 @@ config(['$routeProvider', function($routeProvider) {
               .rangeRound([0, width])
 
           if ($scope.scale) {
-            
+
             // Only display the axis
             g.append("g")
                 // .attr("transform", "translate(0," + height + ")")
@@ -180,7 +182,7 @@ config(['$routeProvider', function($routeProvider) {
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "12px")
                 .attr("fill", "steelblue")
-            
+
           }
         })
       }
