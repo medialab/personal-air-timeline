@@ -210,3 +210,88 @@ config(['$routeProvider', function($routeProvider) {
     }
   }
 })
+
+.directive('bwCurve', function($timeout){
+  return {
+    restrict: 'E',
+    template: '<small style="opacity:0.5;">{{title}} loading...</small>',
+    scope: {
+      timelineData: '=',
+      accessor: '=',
+      title: '='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('timelineData', redraw, true)
+      window.addEventListener('resize', redraw)
+      $scope.$on('$destroy', function(){
+        window.removeEventListener('resize', redraw)
+      })
+
+      var container = el
+
+      function redraw(){
+        $timeout(function(){
+          container.html('');
+
+          // Setup: dimensions
+          var margin = {top: 6, right: 6, bottom: 24, left: 6};
+          var width = container[0].offsetWidth - margin.left - margin.right;
+          var height = container[0].offsetHeight - margin.top - margin.bottom;
+
+          // // While loading redraw may trigger before element being properly sized
+          if (width <= 0 || height <= 0) {
+            $timeout(redraw, 250)
+            return
+          }
+
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var x = d3.scaleTime()
+              .range([0, width])
+
+          // Only display the data
+          var y = d3.scaleLinear()
+              .range([height, 0])
+
+          var line = d3.line()
+              .defined(function(d) { return y(d[$scope.accessor]) && d.def})
+              .x(function(d) { return x(d.timestamp); })
+              .y(function(d) { return y(d[$scope.accessor]); })
+
+          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+          g.append("path")
+              .datum($scope.timelineData)
+              .attr("fill", "none")
+              .attr("stroke", "black")
+              .attr("stroke-linejoin", "round")
+              .attr("stroke-linecap", "round")
+              .attr("stroke-width", 0.5)
+              .attr("d", line);
+
+          /*g.append("text")
+              .attr('x', -6)
+              .attr('y', 18)
+              .text($scope.title)
+              .attr("text-anchor", "end")
+              .attr("font-family", "sans-serif")
+              .attr("font-size", "12px")
+              .attr("fill", "black")*/
+
+          g.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x))
+              .attr("class", "bwAxis")
+        })
+      }
+    }
+  }
+})

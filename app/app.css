@@ -183,6 +183,15 @@ a:active  {
   margin: 0;
   font-size: 28px;
 }
+.a4page .bwAxis line, .a4page .bwAxis path {
+  stroke-width: 0.5px;
+}
+.a4page .bwAxis text {
+  fill: black;
+  font-size: 9px;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 300;
+}
 
 /* Tune leaflet canvas */
 leaflet-canvas .leaflet-tile-pane .leaflet-layer{
