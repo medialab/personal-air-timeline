@@ -11,7 +11,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
       var div = el.find('div')[0];
 
       // Filtering irrelevant points
-      $scope.data = $scope.data.filter(function(d) {
+      data = $scope.data.filter(function(d) {
         return d.x && d.y;
       });
 
@@ -21,7 +21,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           minY = Infinity,
           maxY = -Infinity;
 
-      $scope.data.forEach(function(d) {
+      data.forEach(function(d) {
         if (d.x < minX)
           minX = d.x;
         if (d.x > maxX)
