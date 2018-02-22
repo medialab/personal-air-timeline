@@ -10,6 +10,11 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
     link: function($scope, el, attrs) {
       var div = el.find('div')[0];
 
+      // Filtering irrelevant points
+      $scope.data = $scope.data.filter(function(d) {
+        return d.x && d.y;
+      });
+
       // Finding boundaries
       var minX = Infinity,
           maxX = -Infinity,
