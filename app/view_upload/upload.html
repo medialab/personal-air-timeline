@@ -62,12 +62,11 @@
   
   <div
     layout="column"
-    layout-padding
     flex
     class="fancy-text content"
     ng-if="(sensorFiles|keylength) == 0 && (timelineFiles|keylength) == 0"
   >
-    <div layout="row">
+    <div layout="row" layout-padding>
       <md-icon style="width: 128px; font-size:105px; margin: 0px; color: #FFF">cloud_upload</md-icon>
       <div flex layout="column">
         <h1 class="main-title">
@@ -77,15 +76,30 @@
         </h1>
       </div>
     </div>
-    <md-content style="background-color: rgba(255, 255, 255, 0);">
-      <p>
-        Upload Google Maps Timeline data and Air Labs sensor data to merge it into a new file.
-      </p>
-      <ul>
-        <li>Every data point from the Air Labs sensor is kept. It contains temperature, pressure, humidity, particulate matter 2.5 index and particulate matter 10 index.</li>
-        <li>Merged data contains (X,Y) coordinates from the Google Maps Timeline files (these are Longitude and Latitude, respectively).</li>
-        <li>The data is enriched with average particulate matter 2.5 index and particulate matter 10 index at (X,Y) after modelled data from a governmental source.</li>
-      </ul>
+    <div layout layout-padding flex>
+      <md-content style="background-color: rgba(255, 255, 255, 0);">
+        <p>
+          Upload Google Maps Timeline data and Air Labs sensor data to merge it into a new file.
+        </p>
+        <ul>
+          <li>Every data point from the Air Labs sensor is kept. It contains temperature, pressure, humidity, particulate matter 2.5 index and particulate matter 10 index.</li>
+          <li>Merged data contains (X,Y) coordinates from the Google Maps Timeline files (these are Longitude and Latitude, respectively).</li>
+          <li>The data is enriched with average particulate matter 2.5 index and particulate matter 10 index at (X,Y) after modelled data from a governmental source.</li>
+        </ul>
+      </md-content>
+    </div>
+    <md-content layout="row" style="height: 110px; background-color: #abb7b8; overflow: hidden" layout-align="start start">
+      <div layout-padding>
+        <md-switch class="md-primary" name="special" ng-model="showOptions">
+          More options
+        </md-switch>
+      </div>
+      <div flex ng-show="showOptions" layout-padding>
+        <md-input-container class="md-block">
+          <label>SENSOR-TIMELINE OFFSET</label>
+          <input type="number" step="any" ng-model="offset" />
+        </md-input-container>
+      </div>
     </md-content>
     <!-- <p>
       + <a href="http://tools.medialab.sciences-po.fr/">more tools</a>
