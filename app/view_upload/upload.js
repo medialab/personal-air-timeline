@@ -589,26 +589,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
 }])
 
-.factory('store', [function(){
-  var savedData = {}
-
-  function set(key, data){
-    savedData[key] = data
-  }
-  function get(key){
-    return savedData[key]
-  }
-  function remove(key){
-    return delete savedData[key]
-  }
-
-  return {
-    set: set
-    ,get: get
-    ,remove: remove
-  }
-}])
-
 .factory('droppable', [function(){
   return function(droppable, classReference, $scope, callback){
     //============== DRAG & DROP =============
