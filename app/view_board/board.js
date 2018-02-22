@@ -12,10 +12,20 @@ angular.module('saveourair.view_board', ['ngRoute'])
   });
 }])
 
-.controller('BoardCtrl', ['$scope', '$timeout', '$location'
-  ,function(               $scope ,  $timeout ,  $location) {
+.controller('BoardCtrl', function($scope, $timeout, $location, store) {
   	$scope.loading = true
-		d3.csv('data/test.csv', renderData)
+  	
+  	if (store.get('reconciledData')) {
+  		renderData(store.get('reconciledData'))
+  	} else {
+  		// DEV MODE: load test data
+			d3.csv('data/test.csv', renderData)
+
+			// PROD MODE: redirect to upload page
+			/*$timeout(function(){
+      $location.url('/upload')
+    }, 0)*/
+  	}
 
   	function renderData(data){
 
@@ -37,19 +47,16 @@ angular.module('saveourair.view_board', ['ngRoute'])
         d_prev = d
         d.def = defined
   		})
-  		
+
 
   		$timeout(function(){
   			$scope.loading = false
   			
-  			console.log('data', data)
-  			window.data = data
+  			// console.log('data', data)
+  			// window.data = data
 
   			$scope.timelineData = data
   		})
   	}
 
-  	/*$timeout(function(){
-      $location.url('/upload')
-    }, 0)*/
-}]);
+});

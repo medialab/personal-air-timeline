@@ -93,6 +93,7 @@ config(['$routeProvider', function($routeProvider) {
 .directive('condensedCurve', function($timeout){
   return {
     restrict: 'E',
+    template: '<small style="opacity:0.5;">{{title}} loading...</small>',
     scope: {
       timelineData: '=',
       accessor: '=',

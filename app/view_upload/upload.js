@@ -89,8 +89,10 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     $timeout(function(){
       $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
       store.set('reconciledData', $scope.reconciledData)
-      window.data = $scope.reconciledData
-      console.log('data', data)
+
+      // window.data = $scope.reconciledData
+      // console.log('data', data)
+      
       $scope.pendingReconcile = false
     })
   }
