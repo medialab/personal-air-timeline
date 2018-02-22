@@ -14,23 +14,6 @@ require('angular-route');
 // Making some modules global for the custom scripts to consume
 var d3 = require('d3');
 window.d3 = d3;
-var numeric = require('numeric');
-window.numeric = numeric;
-
-// Requiring some graphology libraries we are going to make global for the user
-var randomLayout = require('graphology-layout/random');
-var forceAtlas2Layout = require('graphology-layout-forceatlas2');
-window.layout = {
-  random: randomLayout,
-  forceAtlas2: forceAtlas2Layout
-};
-
-window.ForceAtlas2Layout = require('graphology-layout-forceatlas2/worker');
-
-window.louvain = require('graphology-communities-louvain');
-
-// Requiring sigma
-window.Sigma = require('sigma/endpoint');
 
 // Requiring own modules
 require('./directives/leaflet.js');

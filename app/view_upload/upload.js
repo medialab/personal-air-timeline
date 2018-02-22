@@ -1,7 +1,5 @@
 'use strict';
 
-var graphology = require('graphology');
-var gexf = require('graphology-gexf/browser');
 var QuadTree = require('../../scripts/quad-tree.js');
 
 function debounce(func, wait, immediate) {
