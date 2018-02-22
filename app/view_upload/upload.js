@@ -43,8 +43,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
-  $scope.$watch('sensorFiles', updateUploads, true)
-  $scope.$watch('timelineFiles', updateUploads, true)
+  $scope.offset
 
   // Load pm files
   d3.text('./data/quad-tree-pm10.csv', function(data){
@@ -90,9 +89,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
       store.set('reconciledData', $scope.reconciledData)
 
-      // window.data = $scope.reconciledData
+      window.data = $scope.reconciledData
       // console.log('data', data)
-      
+
       $scope.pendingReconcile = false
     })
   }
@@ -160,6 +159,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function sensorParsingSuccess() {
     $scope.sensorLoadingMessage = ''
     $scope.sensorDropClass = ''
+    updateUploads()
     $scope.$apply()
   }
   function sensorParsingFail(fileName) {
@@ -224,6 +224,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function timelineParsingSuccess() {
     $scope.timelineLoadingMessage = ''
     $scope.timelineDropClass = ''
+    updateUploads()
     $scope.$apply()
   }
   function timelineParsingFail(fileName) {
@@ -368,7 +369,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
           } else {
             // Interval is a linestring
-            // console.log('linestring', interval)
             var coordinatesList = interval.path.split(' ')
               .map(function(path){ return path.split(',').map(function(d){return +d}) })
               .filter(function(path){ return path.length >= 2 })
@@ -401,7 +401,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
               coordinatesList.forEach(function(c, i){
                 var ratio = ratios[i]
                 var ts = interval.beginTimestamp + ratio * (interval.endTimestamp - interval.beginTimestamp)
-                
+
                 timestampsIndex[ts] = timestampsIndex[ts] || {ts:ts}
                 timestampsIndex[ts].before = c
                 timestampsIndex[ts].after = c
@@ -447,8 +447,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       }
     }
 
-    // Build data points after sensor data
+    /// Build data points after sensor data
     var datapoints = {}
+    var offset = $scope.offset || 0
     for (fileName in sensorfiles) {
       var data = sensorfiles[fileName]
       var dateFormatRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2})$/
@@ -464,6 +465,8 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             (+dateArray[5]),
             (+dateArray[6])
         )
+
+        dateObject = new Date(dateObject.getTime() + offset * 60000)
 
         var datestring = dateObject.toString()
         var timestamp = dateObject.getTime()
@@ -489,9 +492,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         d.y = coordinates[1]
       }
       return d
-    })
+    }).sort(function(a, b) {return a.timestamp-b.timestamp})
 
-    // Retrieving data from both quadtrees
+    /// Retrieving data from both quadtrees
     finalData.forEach(function(d){
       if (!d.x || !d.y)
         return;
@@ -503,7 +506,44 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       d.DCE_PM10 = pm10 || ''
     })
 
+    /// Additional stuff
+    var movementThresholdsMeters = [10, 50, 100, 500]
+    finalData.forEach(function(d, i){
+      if (i>0) {
+        var d_meters = haversine(d, finalData[i-1])
+        var instant_speed_mps = d_meters / ((d.timestamp - finalData[i-1].timestamp) / 1000)
+        var instant_speed_kph = 3600 * instant_speed_mps / 1000
+
+        // Average point since 1 minute
+        /*var datapoints
+        datapoints = finalData.filter(function(d, i))
+        var currentXY =
+        var oneminute_speed_mps*/
+        // console.log(Math.round(instant_speed_kph * 100)/100)
+      }
+    })
+
     return finalData
+  }
+
+  function haversine(a, b) {
+    if (a.x === b.x && a.y === b.y)
+      return 0;
+
+    var R = Math.PI / 180;
+
+    var lon1 = a.y * R,
+        lat1 = a.x * R,
+        lon2 = b.y * R,
+        lat2 = b.x * R;
+
+    var dlon = lon2 - lon1,
+        dlat = lat2 - lat1,
+        a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2),
+        c = 2 * Math.asin(Math.sqrt(a)),
+        km = 6371 * c;
+
+    return km * 1000;
   }
 
   function parseXml(xmlStr) {
@@ -613,7 +653,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       })
     }, false)
     droppable.addEventListener("drop", function(evt) {
-      // console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
       evt.stopPropagation()
       evt.preventDefault()
       $scope.$apply(function(){

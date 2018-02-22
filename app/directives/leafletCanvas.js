@@ -10,13 +10,18 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
     link: function($scope, el, attrs) {
       var div = el.find('div')[0];
 
+      // Filtering irrelevant points
+      data = $scope.data.filter(function(d) {
+        return d.x && d.y;
+      });
+
       // Finding boundaries
       var minX = Infinity,
           maxX = -Infinity,
           minY = Infinity,
           maxY = -Infinity;
 
-      $scope.data.forEach(function(d) {
+      data.forEach(function(d) {
         if (d.x < minX)
           minX = d.x;
         if (d.x > maxX)
@@ -49,7 +54,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
             return map.latLngToLayerPoint([point.y, point.x]);
           };
         }
-    });
+      });
 
       // Map initialization
       $scope.map = Leaflet.map(div, {
@@ -75,27 +80,6 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
       var canvasLayer = new Leaflet.CanvasLayer();
       canvasLayer.addTo($scope.map);
-
-      // Adding points
-      // $scope.data.forEach(function(d) {
-      //   var marker = Leaflet.circleMarker([d.y, d.x], {
-      //     radius: 5,
-      //     fillOpacity: 1,
-      //     color: '#fff'
-      //   });
-
-      //   marker.addTo($scope.map);
-      // });
-
-      // $scope.data.forEach(function(d) {
-      //   var marker = Leaflet.circleMarker([d.y, d.x], {
-      //     radius: 3,
-      //     fillOpacity: 1,
-      //     color: 'steelblue'
-      //   });
-
-      //   marker.addTo($scope.map);
-      // });
     }
   };
 }]);

@@ -10,13 +10,18 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
     link: function($scope, el, attrs) {
       var div = el.find('div')[0];
 
+      // Filtering irrelevant points
+      var data = $scope.data.filter(function(d) {
+        return d.x && d.y;
+      });
+
       // Finding boundaries
       var minX = Infinity,
           maxX = -Infinity,
           minY = Infinity,
           maxY = -Infinity;
 
-      $scope.data.forEach(function(d) {
+      data.forEach(function(d) {
         if (d.x < minX)
           minX = d.x;
         if (d.x > maxX)
@@ -44,7 +49,7 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
       }).addTo($scope.map);
 
       // Adding points
-      $scope.data.forEach(function(d) {
+      data.forEach(function(d) {
         var marker = Leaflet.circleMarker([d.y, d.x], {
           radius: 5,
           fillOpacity: 1,
@@ -54,7 +59,7 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
         marker.addTo($scope.map);
       });
 
-      $scope.data.forEach(function(d) {
+      data.forEach(function(d) {
         var marker = Leaflet.circleMarker([d.y, d.x], {
           radius: 3,
           fillOpacity: 1,

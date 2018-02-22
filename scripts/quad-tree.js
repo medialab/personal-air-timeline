@@ -91,10 +91,9 @@ QuadTree.prototype.forEachLeaf = function(callback) {
 
 QuadTree.prototype.toCSV = function() {
   var lines = new Array(this.quads + 1),
-      stack = Stack.from([[this.root, 0]]),
+      stack = Stack.from([this.root]),
       i = 0,
       quad,
-      quadIndex,
       mask;
 
   lines[i++] = [
@@ -107,7 +106,7 @@ QuadTree.prototype.toCSV = function() {
   ];
 
   while (stack.size) {
-    [quad, quadIndex] = stack.pop();
+    quad = stack.pop();
 
     mask = [
       +!!quad.quads[0],
@@ -121,18 +120,17 @@ QuadTree.prototype.toCSV = function() {
       quad.mu.toFixed(4).length < quad.mu.toString().length ?
         quad.mu.toFixed(4) :
         quad.mu,
-      parseInt(mask, 2),
-      quadIndex
+      parseInt(mask, 2)
     ].join(',');
 
     if (quad.quads[3])
-      stack.push([quad.quads[3], 3]);
+      stack.push(quad.quads[3]);
     if (quad.quads[2])
-      stack.push([quad.quads[2], 2]);
+      stack.push(quad.quads[2]);
     if (quad.quads[1])
-      stack.push([quad.quads[1], 1]);
+      stack.push(quad.quads[1]);
     if (quad.quads[0])
-      stack.push([quad.quads[0], 0]);
+      stack.push(quad.quads[0]);
   }
 
   return lines.join('\n');
@@ -142,7 +140,21 @@ function getStringMask(number) {
   return ('0000' + number.toString(2)).slice(-4);
 }
 
-// TODO: lighten by dropping quadIndex from CSV
+function getChildrenStack(number) {
+  return ('0000' + number.toString(2))
+    .slice(-4)
+    .split('')
+    .reverse()
+    .map(function(b, i) {
+      return [3 - i, b];
+    })
+    .filter(function(a) {
+      return a[1] === '1';
+    })
+    .map(function(a) {
+      return a[0];
+    });
+}
 
 QuadTree.fromCSV = function(lines) {
   var boundaries = lines[0];
@@ -178,20 +190,21 @@ QuadTree.fromCSV = function(lines) {
   // NOTE: will break if root is leaf obviously...
   quad.count = +line[0];
   quad.mu = +line[1];
-  quad.lastChild = getStringMask(+line[2]).lastIndexOf('1');
+  quad.childrenStack = getChildrenStack(+line[2]);
 
   for (i = 2, l = lines.length; i < l; i++) {
     line = lines[i];
     count = +line[0];
     mu = +line[1];
     mask = +line[2];
-    quadIndex = +line[3];
     isLeaf = mask === 0;
 
     parent = stack.peek();
 
     halfWidth = parent.width / 2;
     halfHeight = parent.height / 2;
+
+    quadIndex = parent.childrenStack.pop();
 
     if (quadIndex === 0)
       quad = new Quad(parent.x, parent.y, halfWidth, halfHeight);
@@ -218,19 +231,19 @@ QuadTree.fromCSV = function(lines) {
         tree.max = mu;
 
       // Should we bubble up?
-      while (stack.size && parent.quads[parent.lastChild] instanceof Quad) {
-        delete parent.lastChild;
+      while (stack.size && parent.childrenStack.length === 0) {
+        delete parent.childrenStack;
         stack.pop();
         parent = stack.peek();
       }
     }
     else {
-      quad.lastChild = getStringMask(mask).lastIndexOf('1');
+      quad.childrenStack = getChildrenStack(mask);
       stack.push(quad);
     }
   }
 
-  delete tree.root.lastChild;
+  delete tree.root.childrenStack;
 
   return tree;
 };
