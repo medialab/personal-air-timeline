@@ -43,6 +43,8 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
+  $scope.offset
+
   // Load pm files
   d3.text('./data/quad-tree-pm10.csv', function(data){
     var lines = d3.csvParseRows(data);
@@ -89,7 +91,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
       window.data = $scope.reconciledData
       // console.log('data', data)
-      
+
       $scope.pendingReconcile = false
     })
   }
@@ -399,7 +401,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
               coordinatesList.forEach(function(c, i){
                 var ratio = ratios[i]
                 var ts = interval.beginTimestamp + ratio * (interval.endTimestamp - interval.beginTimestamp)
-                
+
                 timestampsIndex[ts] = timestampsIndex[ts] || {ts:ts}
                 timestampsIndex[ts].before = c
                 timestampsIndex[ts].after = c
@@ -447,6 +449,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
     /// Build data points after sensor data
     var datapoints = {}
+    var offset = $scope.offset || 0
     for (fileName in sensorfiles) {
       var data = sensorfiles[fileName]
       var dateFormatRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2}):(\d{2})$/
@@ -462,6 +465,8 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             (+dateArray[5]),
             (+dateArray[6])
         )
+
+        dateObject = new Date(dateObject.getTime() + offset * 60000)
 
         var datestring = dateObject.toString()
         var timestamp = dateObject.getTime()
@@ -512,7 +517,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         // Average point since 1 minute
         /*var datapoints
         datapoints = finalData.filter(function(d, i))
-        var currentXY = 
+        var currentXY =
         var oneminute_speed_mps*/
         // console.log(Math.round(instant_speed_kph * 100)/100)
       }
