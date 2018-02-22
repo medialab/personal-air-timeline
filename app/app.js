@@ -34,6 +34,7 @@ window.Sigma = require('sigma/endpoint');
 
 // Requiring own modules
 require('./directives/leaflet.js');
+require('./directives/leafletCanvas.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
 require('./view_focus/focus.js');
@@ -44,6 +45,7 @@ angular.module('saveourair', [
   'ngSanitize',
   'ngMaterial',
   'saveourair.directives.leaflet',
+  'saveourair.directives.leafletCanvas',
   'saveourair.view_upload',
   'saveourair.view_board',
   'saveourair.view_focus'
@@ -65,9 +67,47 @@ config(['$routeProvider', function($routeProvider) {
 })
 
 // Services
-.factory('cache', function(){
+.factory('store', function(){
+  var savedData = {}
+
+  function set(key, data){
+    savedData[key] = data
+  }
+  function get(key){
+    return savedData[key]
+  }
+  function remove(key){
+    return delete savedData[key]
+  }
+
+  return {
+    set: set
+    ,get: get
+    ,remove: remove
+  }
+})
+
+.factory('dataprocess', function(){
   var ns = {}
-  ns.recipes = {}
+  ns.consolidate = function(data) {
+    var fiveminutesms = 5*60*1000
+    var d_prev
+    data.forEach(function(d){
+      d.timestamp = +d.timestamp
+      d.T = +d.T
+      d.RH = +d.RH
+      d.P = +d.P
+      d.PM25 = +d.PM25
+      d.PM10 = +d.PM10
+      d.DCE_PM25 = +d.DCE_PM25 || undefined
+      d.DCE_PM10 = +d.DCE_PM10 || undefined
+      d.x = +d.x || undefined
+      d.y = +d.y || undefined
+      var defined = d_prev && d.timestamp - d_prev.timestamp < fiveminutesms
+      d_prev = d
+      d.def = defined
+    })
+  }
   return ns
 })
 
@@ -141,7 +181,7 @@ config(['$routeProvider', function($routeProvider) {
               .rangeRound([0, width])
 
           if ($scope.scale) {
-            
+
             // Only display the axis
             g.append("g")
                 // .attr("transform", "translate(0," + height + ")")
@@ -180,7 +220,7 @@ config(['$routeProvider', function($routeProvider) {
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "12px")
                 .attr("fill", "steelblue")
-            
+
           }
         })
       }

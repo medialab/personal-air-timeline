@@ -191,3 +191,25 @@ h3.script-title {
   /* Load the fonts we plan to use in the canvas */
   font-family: 'Open Sans Condensed', sans-serif;
 }
+
+/* A4 page for printing */
+@media print {
+  .page-container {
+    overflow: hidden;
+  }
+}
+@media screen {
+  .page-container {
+    overflow: scroll;
+  }
+}
+.a4page {
+  background-color: #FFF;
+  width: 170mm;
+  height: 257mm;
+  overflow: hidden;
+}
+@page {
+  size: 210mm 297mm;
+  margin: 18mm 18mm 18mm 18mm;
+}

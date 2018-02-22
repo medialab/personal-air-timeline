@@ -9,13 +9,19 @@ angular.module('saveourair.view_focus', ['ngRoute'])
   });
 }])
 
-.controller('FocusCtrl', function($scope, $timeout, $location, store) {
+.controller('FocusCtrl', function($scope, $timeout, $location, store, dataprocess) {
   	$scope.loading = true
   	
   	if (store.get('reconciledData')) {
   		renderData(store.get('reconciledData'))
   	} else {
-  		// DEV MODE: load test data
+      var centralTimestamp = 1518909277000;
+      $scope.start = centralTimestamp - 30*60*1000
+      $scope.end = centralTimestamp + 30*60*1000
+      $scope.startDate = shortFormatDate(new Date($scope.start))
+      $scope.endDate = shortFormatDate(new Date($scope.end))
+  		
+      // DEV MODE: load test data
 			d3.csv('data/test.csv', renderData)
 
 			// PROD MODE: redirect to upload page
@@ -25,35 +31,36 @@ angular.module('saveourair.view_focus', ['ngRoute'])
   	}
 
   	function renderData(data){
-
-  		// Consolidate
-      var fiveminutesms = 5*60*1000
-      var d_prev
-  		data.forEach(function(d){
-  			d.timestamp = +d.timestamp
-  			d.T = +d.T
-  			d.RH = +d.RH
-  			d.P = +d.P
-  			d.PM25 = +d.PM25
-  			d.PM10 = +d.PM10
-  			d.DCE_PM25 = +d.DCE_PM25 || undefined
-  			d.DCE_PM10 = +d.DCE_PM10 || undefined
-  			d.x = +d.x || undefined
-  			d.y = +d.y || undefined
-        var defined = d_prev && d.timestamp - d_prev.timestamp < fiveminutesms
-        d_prev = d
-        d.def = defined
-  		})
-
+      data = data.filter(function(d){
+        return $scope.start <= d.timestamp
+          && d.timestamp < $scope.end
+      })
+      dataprocess.consolidate(data)
 
   		$timeout(function(){
   			$scope.loading = false
   			
-  			// console.log('data', data)
-  			// window.data = data
+  			console.log('data', data)
+  			window.data = data
 
   			$scope.timelineData = data
   		})
   	}
+
+    //
+    function shortFormatDate(date) {
+      var monthNames = [
+        "January", "February", "March",
+        "April", "May", "June", "July",
+        "August", "September", "October",
+        "November", "December"
+      ];
+
+      var day = date.getDate();
+      var monthIndex = date.getMonth();
+      var year = date.getFullYear();
+
+      return day + ' ' + monthNames[monthIndex] + ' ' + year;
+    }
 
 });
