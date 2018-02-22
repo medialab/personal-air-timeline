@@ -1,0 +1,12 @@
+<md-card md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
+  <md-card-title>
+    <md-card-title-text>
+      <span class="md-headline">Travel overview</span>
+    </md-card-title-text>
+  </md-card-title>
+  <md-card-content style="height: 500px">
+    <div layout-fill>
+      <leaflet data="timelineData"></leaflet>
+    </div>
+  </md-card-content>
+</md-card>

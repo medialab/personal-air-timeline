@@ -36,6 +36,7 @@ window.Sigma = require('sigma/endpoint');
 require('./directives/leaflet.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
+require('./view_focus/focus.js');
 
 // Declare app level module which depends on views, and components
 angular.module('saveourair', [
@@ -44,18 +45,19 @@ angular.module('saveourair', [
   'ngMaterial',
   'saveourair.directives.leaflet',
   'saveourair.view_upload',
-  'saveourair.view_board'
+  'saveourair.view_board',
+  'saveourair.view_focus'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/upload'});
 }])
 
 // Filters
-.filter('number', function() {
+/*.filter('number', function() {
   return function(d) {
     return +d
   }
-})
+})*/
 .filter('percent', function() {
   return function(d) {
     return Math.round(+d*100)+'%'
@@ -73,7 +75,17 @@ config(['$routeProvider', function($routeProvider) {
 .directive('timelineSummaryCard', function($timeout){
   return {
     restrict: 'E',
-    templateUrl: 'view_board/timelineSummaryCard.html',
+    templateUrl: 'directives/timelineSummaryCard.html',
+    scope: {
+      timelineData: '='
+    }
+  }
+})
+
+.directive('leafletCard', function($timeout){
+  return {
+    restrict: 'E',
+    templateUrl: 'directives/leafletCard.html',
     scope: {
       timelineData: '='
     }
@@ -83,9 +95,11 @@ config(['$routeProvider', function($routeProvider) {
 .directive('condensedCurve', function($timeout){
   return {
     restrict: 'E',
+    template: '<small style="opacity:0.5;">{{title}} loading...</small>',
     scope: {
       timelineData: '=',
       accessor: '=',
+      title: '=',
       scale: '='
     },
     link: function($scope, el, attrs) {
@@ -101,11 +115,10 @@ config(['$routeProvider', function($routeProvider) {
 
       function redraw(){
         $timeout(function(){
-          console.log($scope.accessor)
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 6, right: 12, bottom: 30, left: 150};
+          var margin = {top: 6, right: 0, bottom: 6, left: 200};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
@@ -127,31 +140,48 @@ config(['$routeProvider', function($routeProvider) {
           var x = d3.scaleTime()
               .rangeRound([0, width])
 
-          var y = d3.scaleLinear()
-              .rangeRound([height, 0])
+          if ($scope.scale) {
+            
+            // Only display the axis
+            g.append("g")
+                // .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+              // .select(".domain")
+              //   .remove();
 
-          var line = d3.line()
-              .defined(function(d) { return y(d[$scope.accessor]) && d.def})
-              .x(function(d) { return x(d.timestamp); })
-              .y(function(d) { return y(d[$scope.accessor]); })
+          } else {
 
-          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
-          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+            // Only display the data
+            var y = d3.scaleLinear()
+                .range([height, 0])
 
-          g.append("g")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(x))
-            .select(".domain")
-              .remove();
+            var line = d3.line()
+                .defined(function(d) { return y(d[$scope.accessor]) && d.def})
+                .x(function(d) { return x(d.timestamp); })
+                .y(function(d) { return y(d[$scope.accessor]); })
 
-          g.append("path")
-              .datum($scope.timelineData)
-              .attr("fill", "none")
-              .attr("stroke", "steelblue")
-              .attr("stroke-linejoin", "round")
-              .attr("stroke-linecap", "round")
-              .attr("stroke-width", 1.5)
-              .attr("d", line);
+            x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+            y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+            g.append("path")
+                .datum($scope.timelineData)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 1.5)
+                .attr("d", line);
+
+            g.append("text")
+                .attr('x', -6)
+                .attr('y', 18)
+                .text($scope.title)
+                .attr("text-anchor", "end")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "12px")
+                .attr("fill", "steelblue")
+            
+          }
         })
       }
     }

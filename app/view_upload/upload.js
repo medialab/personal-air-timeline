@@ -69,7 +69,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function updateUploads() {
     var someTimelineFiles = Object.keys($scope.timelineFiles).length > 0
     var someSensorFiles = Object.keys($scope.sensorFiles).length > 0
-    var data = {}
     if (someSensorFiles && someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data .............. OK\nTimeline data ............ OK\n>>>>>>>>>>>>>>>>>> DATA READY\n\nNote: You may upload\n      additional files'
 
@@ -84,15 +83,18 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     } else if (!someSensorFiles && someTimelineFiles) {
       $scope.uploadStatusMessage = 'Sensor data >>> PLEASE UPLOAD\nTimeline data ............ OK'
     }
-
-    store.set('data', data)
   }
 
   var finalizeReconciling = function finalizeReconciling() {
-    $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
-    store.set('reconciledData', $scope.reconciledData)
-    window.D = $scope.reconciledData
-    $scope.pendingReconcile = false
+    $timeout(function(){
+      $scope.reconciledData = reconcileFiles($scope.sensorFiles, $scope.timelineFiles, $scope.pm25tree, $scope.pm10tree)
+      store.set('reconciledData', $scope.reconciledData)
+
+      // window.data = $scope.reconciledData
+      // console.log('data', data)
+      
+      $scope.pendingReconcile = false
+    })
   }
 
   finalizeReconciling = debounce(finalizeReconciling, 500);
