@@ -34,10 +34,10 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
       });
 
       // Custom canvas layer
-      Leaflet.CanvasLayer = L.Layer.extend({
+      Leaflet.CanvasLayer = Leaflet.Layer.extend({
         onAdd: function(map) {
           var pane = map.getPane(this.options.pane);
-          var canvas = L.DomUtil.create('canvas');
+          var canvas = Leaflet.DomUtil.create('canvas');
           var mapSize = map.getSize();
 
           var pixelRatio = 2;
@@ -51,15 +51,37 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           pane.appendChild(canvas);
 
           var pos = function(point) {
-            return map.latLngToLayerPoint([point.y, point.x]);
+            var result = map.latLngToLayerPoint([point.y, point.x]);
+            result.x *= pixelRatio
+            result.y *= pixelRatio
+            return result
           };
+
+          // Faire des gigi avec des gugu
+          var ctx = canvas.getContext('2d')
+          var lastD
+          data.forEach(function(d){
+            if (d.def && lastD) {
+              // Transformation
+              var d_canvas = pos(d)
+              var lastD_canvas = pos(lastD)
+
+              // Draw
+              ctx.beginPath()
+              ctx.moveTo(lastD_canvas.x, lastD_canvas.y)
+              ctx.lineTo(d_canvas.x, d_canvas.y)
+              ctx.stroke()
+
+            }
+            lastD = d
+          })
         }
       });
 
       // Map initialization
       $scope.map = Leaflet.map(div, {
         center: [56.056695, 9.841720],
-        zoomSnap: 0.5,
+        zoomSnap: 0.8,
         attributionControl: false,
         zoomControl: false,
         dragging: false,
