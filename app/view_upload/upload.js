@@ -534,6 +534,9 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         } else {
           oneminute_speed_kph = undefined
         }
+
+        d.instantspeed = instant_speed_kph
+        d.smoothedspeed = oneminute_speed_kph
       }
     })
 

@@ -161,7 +161,7 @@ config(['$routeProvider', function($routeProvider) {
           var parseTime = d3.timeParse("%L")
 
           var x = d3.scaleTime()
-              .rangeRound([0, width])
+              .range([0, width])
 
           if ($scope.scale) {
 
