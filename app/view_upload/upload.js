@@ -43,9 +43,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   $scope.sensorFiles = {}
   $scope.timelineFiles = {}
 
-  $scope.$watch('sensorFiles', updateUploads, true)
-  $scope.$watch('timelineFiles', updateUploads, true)
-
   // Load pm files
   d3.text('./data/quad-tree-pm10.csv', function(data){
     var lines = d3.csvParseRows(data);
@@ -160,6 +157,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function sensorParsingSuccess() {
     $scope.sensorLoadingMessage = ''
     $scope.sensorDropClass = ''
+    updateUploads()
     $scope.$apply()
   }
   function sensorParsingFail(fileName) {
@@ -224,6 +222,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   function timelineParsingSuccess() {
     $scope.timelineLoadingMessage = ''
     $scope.timelineDropClass = ''
+    updateUploads()
     $scope.$apply()
   }
   function timelineParsingFail(fileName) {
@@ -368,7 +367,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
             timestampsIndex[interval.endTimestamp].before = interval.path.split(',').map(function(d){return +d})
           } else {
             // Interval is a linestring
-            // console.log('linestring', interval)
             var coordinatesList = interval.path.split(' ')
               .map(function(path){ return path.split(',').map(function(d){return +d}) })
               .filter(function(path){ return path.length >= 2 })
@@ -504,15 +502,21 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     })
 
     /// Additional stuff
-    /*var movementThresholdMeters = 50
+    var movementThresholdsMeters = [10, 50, 100, 500]
     finalData.forEach(function(d, i){
       if (i>0) {
         var d_meters = haversine(d, finalData[i-1])
         var instant_speed_mps = d_meters / ((d.timestamp - finalData[i-1].timestamp) / 1000)
         var instant_speed_kph = 3600 * instant_speed_mps / 1000
+
+        // Average point since 1 minute
+        /*var datapoints
+        datapoints = finalData.filter(function(d, i))
+        var currentXY = 
+        var oneminute_speed_mps*/
         // console.log(Math.round(instant_speed_kph * 100)/100)
       }
-    })*/
+    })
 
     return finalData
   }
@@ -644,7 +648,6 @@ angular.module('saveourair.view_upload', ['ngRoute'])
       })
     }, false)
     droppable.addEventListener("drop", function(evt) {
-      // console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
       evt.stopPropagation()
       evt.preventDefault()
       $scope.$apply(function(){
