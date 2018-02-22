@@ -1,15 +1,15 @@
 'use strict';
 
-angular.module('saveourair.view_board', ['ngRoute'])
+angular.module('saveourair.view_focus', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/board', {
-    templateUrl: 'view_board/board.html',
-    controller: 'BoardCtrl'
+  $routeProvider.when('/focus', {
+    templateUrl: 'view_focus/focus.html',
+    controller: 'FocusCtrl'
   });
 }])
 
-.controller('BoardCtrl', function($scope, $timeout, $location, store) {
+.controller('FocusCtrl', function($scope, $timeout, $location, store) {
   	$scope.loading = true
   	
   	if (store.get('reconciledData')) {

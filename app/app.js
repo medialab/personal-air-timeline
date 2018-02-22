@@ -36,6 +36,7 @@ window.Sigma = require('sigma/endpoint');
 require('./directives/leaflet.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
+require('./view_focus/focus.js');
 
 // Declare app level module which depends on views, and components
 angular.module('saveourair', [
@@ -44,7 +45,8 @@ angular.module('saveourair', [
   'ngMaterial',
   'saveourair.directives.leaflet',
   'saveourair.view_upload',
-  'saveourair.view_board'
+  'saveourair.view_board',
+  'saveourair.view_focus'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/upload'});
