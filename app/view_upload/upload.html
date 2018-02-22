@@ -77,9 +77,16 @@
         </h1>
       </div>
     </div>
-    <p>
-      [Description to do]
-    </p>
+    <md-content style="background-color: rgba(255, 255, 255, 0);">
+      <p>
+        Upload Google Maps Timeline data and Air Labs sensor data to merge it into a new file.
+      </p>
+      <ul>
+        <li>Every data point from the Air Labs sensor is kept. It contains temperature, pressure, humidity, particulate matter 2.5 index and particulate matter 10 index.</li>
+        <li>Merged data contains (X,Y) coordinates from the Google Maps Timeline files (these are Longitude and Latitude, respectively).</li>
+        <li>The data is enriched with average particulate matter 2.5 index and particulate matter 10 index at (X,Y) after modelled data from a governmental source.</li>
+      </ul>
+    </md-content>
     <!-- <p>
       + <a href="http://tools.medialab.sciences-po.fr/">more tools</a>
       <br>
