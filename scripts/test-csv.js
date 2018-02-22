@@ -12,7 +12,7 @@ var fs = require('fs'),
 var LINES = [];
 
 console.log('Reading CSV quad...');
-csv.fromStream(fs.createReadStream('./scripts/quad-tree.csv'))
+csv.fromStream(fs.createReadStream('./scripts/quad-tree-pm10.csv'))
   .on('data', line => {
     LINES.push(line);
   })
