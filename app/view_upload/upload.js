@@ -100,7 +100,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   finalizeReconciling = debounce(finalizeReconciling, 500);
 
   $scope.download = function() {
-    var blob = new Blob([d3.csvFormat(D)], {'type':'text/csv;charset=utf-8'});
+    var blob = new Blob([d3.csvFormat($scope.reconciledData)], {'type':'text/csv;charset=utf-8'});
     saveAs(blob, "Personal Air Timeline.csv");
   }
 

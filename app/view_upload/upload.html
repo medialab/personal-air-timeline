@@ -105,22 +105,22 @@
           md-mode="indeterminate"
         ></md-progress-circular>
       </div>
-      <div layout="column" flex ng-if="reconciledData">
+      <div layout="column" flex ng-if="reconciledData" layout-align="center center">
         <h3>
           <md-icon>done</md-icon>
-          Data is merged
+          Data successfully merged
         </h3>
-      </div>
-      <div layout="column" ng-if="reconciledData">
-        <md-button class="md-raised md-primary" ng-click="download()">
-          <md-icon>file_download</md-icon>
-          Download
-        </md-button>
-        
-        <md-button class="md-raised" ng-href="#!/board">
-          <md-icon>show_chart</md-icon>
-          Preview
-        </md-button>
+        <div layout="row">
+          <md-button class="md-raised md-primary" ng-click="download()">
+            <md-icon>file_download</md-icon>
+            Download
+          </md-button>
+          
+          <md-button class="md-raised" ng-href="#!/board">
+            <md-icon>show_chart</md-icon>
+            Preview
+          </md-button>
+        </div>
       </div>
     </div>
     <div
