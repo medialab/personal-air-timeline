@@ -20,7 +20,7 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       if ($routeParams.start && $routeParams.end) {
 
         if (!dateRegex.test($routeParams.start) || !dateRegex.test($routeParams.end))
-          alert('Invalid date. Format is YYYY-MM-DDTmm:ss');
+          alert('Invalid date. Format is YYYY-MM-DDThh:mm');
 
         $scope.start = +parseDate($routeParams.start)
         $scope.end = +parseDate($routeParams.end)
