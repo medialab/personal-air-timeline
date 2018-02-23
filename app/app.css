@@ -54,22 +54,8 @@ a:active  {
 .menu-item:hover {
   background-color: #dbedf0;
 }
-.menu-item h3 {
-  font-family: 'Lobster', cursive;
-  font-weight: 400;
-  font-size: 1.4em;
-  margin: 0;
-}
 .menu-item p {
   margin: 0;
-}
-
-h3.script-title {
-  font-family: 'Lobster', cursive;
-  font-weight: 400;
-  font-size: 1.4em;
-  margin: 0;
-  padding: 0;
 }
 
 /* Uploader */
@@ -170,28 +156,6 @@ h3.script-title {
   text-shadow: 2px 3px 0px rgba(0, 0, 0, .1);
 }
 
-/* JS editor */
-#js-editor-container {
-  overflow: hidden;
-}
-.shortcut-info {
-  font-size: 0.8em;
-  opacity: 0.6;
-}
-.exec-button-row {
-  padding-bottom: 6px;
-}
-
-/* Playground */
-#playground {
-  background-color: #FFF;
-  overflow: auto;
-}
-#dummy-font-div {
-  /* Load the fonts we plan to use in the canvas */
-  font-family: 'Open Sans Condensed', sans-serif;
-}
-
 /* A4 page for printing */
 @media print {
   .page-container {
@@ -212,4 +176,33 @@ h3.script-title {
 @page {
   size: 210mm 297mm;
   margin: 18mm 18mm 18mm 18mm;
+}
+.a4page h1 {
+  font-family: 'Roboto Slab', serif;
+  font-weight: 300;
+  margin: 0;
+  font-size: 32px;
+}
+.a4page .bwAxis line, .a4page .bwAxis path {
+  stroke-width: 0.5px;
+}
+.a4page .bwAxis text {
+  fill: black;
+  font-size: 7px;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 300;
+}
+
+/* Tune leaflet canvas */
+leaflet-canvas .leaflet-tile-pane .leaflet-layer{
+  opacity: 0.2 !important;
+}
+leaflet-canvas .leaflet-container{
+  background-color: #FFF !important;
+}
+
+/* Fonts loading */
+#dummy-font-div {
+  /* Load the fonts we plan to use in the canvas */
+  font-family: 'Roboto Slab', sans-serif;
 }

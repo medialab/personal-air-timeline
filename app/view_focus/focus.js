@@ -3,24 +3,36 @@
 angular.module('saveourair.view_focus', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/focus', {
+  $routeProvider.when('/focus/:start?/:end?', {
     templateUrl: 'view_focus/focus.html',
     controller: 'FocusCtrl'
   });
 }])
 
-.controller('FocusCtrl', function($scope, $timeout, $location, store, dataprocess) {
+.controller('FocusCtrl', function($scope, $timeout, $location, $routeParams, store, dataprocess) {
   	$scope.loading = true
-  	
+
+    var dateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
+
   	if (store.get('reconciledData')) {
   		renderData(store.get('reconciledData'))
   	} else {
-      var centralTimestamp = 1518909277000;
-      $scope.start = centralTimestamp - 30*60*1000
-      $scope.end = centralTimestamp + 30*60*1000
-      $scope.startDate = shortFormatDate(new Date($scope.start))
-      $scope.endDate = shortFormatDate(new Date($scope.end))
-  		
+      if ($routeParams.start && $routeParams.end) {
+
+        if (!dateRegex.test($routeParams.start) || !dateRegex.test($routeParams.end))
+          alert('Invalid date. Format is YYYY-MM-DDTmm:ss');
+
+        $scope.start = +parseDate($routeParams.start)
+        $scope.end = +parseDate($routeParams.end)
+        $scope.startDate = titleFormatDate(new Date($scope.start))
+        $scope.endDate = titleFormatDate(new Date($scope.end))
+      }
+      else {
+        $scope.start = undefined
+        $scope.end = undefined
+      }
+
+
       // DEV MODE: load test data
 			d3.csv('data/test.csv', renderData)
 
@@ -30,37 +42,65 @@ angular.module('saveourair.view_focus', ['ngRoute'])
     }, 0)*/
   	}
 
+    function parseDate(string) {
+      var split = string.split('T')
+      var date = split[0].split('-')
+      var time = split[1].split(':')
+
+      return new Date(
+        (+date[0]),
+        (+date[1])-1, // Careful, month starts at 0!
+        (+date[2]),
+        (+time[0]),
+        (+time[1])
+      )
+    }
+
   	function renderData(data){
-      data = data.filter(function(d){
+      dataprocess.consolidate(data)
+
+      $scope.staticPositions = dataprocess.staticPositions(data)
+      $scope.shortStaticPositions = $scope.staticPositions
+        .filter(function(d, i){ return i<5 }) // Max 5 places
+
+      if ($scope.start === undefined) {
+        $scope.start = data[0].timestamp
+        $scope.end = data[data.length - 1].timestamp
+        $scope.startDate = titleFormatDate(new Date($scope.start))
+        $scope.endDate = titleFormatDate(new Date($scope.end))
+      }
+
+  		var filteredData = data.filter(function(d){
         return $scope.start <= d.timestamp
           && d.timestamp < $scope.end
       })
-      dataprocess.consolidate(data)
 
-  		$timeout(function(){
+      $timeout(function(){
   			$scope.loading = false
-  			
-  			console.log('data', data)
-  			window.data = data
 
-  			$scope.timelineData = data
+        $scope.timelineData = data
+  			$scope.filteredTimelineData = filteredData
   		})
   	}
 
     //
-    function shortFormatDate(date) {
+    function titleFormatDate(date) {
       var monthNames = [
-        "January", "February", "March",
+        "Jan", "Feb", "March",
         "April", "May", "June", "July",
-        "August", "September", "October",
-        "November", "December"
+        "Aug", "Sept", "Oct",
+        "Nov", "Dec"
       ];
 
       var day = date.getDate();
       var monthIndex = date.getMonth();
       var year = date.getFullYear();
 
-      return day + ' ' + monthNames[monthIndex] + ' ' + year;
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      if ((''+minutes).length == 1) { minutes = '0' + minutes }
+
+      return day + ' ' + monthNames[monthIndex] + ' ' + year + ' ' + hours + ':' + minutes;
     }
 
 });

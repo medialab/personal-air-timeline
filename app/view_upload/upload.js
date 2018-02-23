@@ -1,7 +1,5 @@
 'use strict';
 
-var graphology = require('graphology');
-var gexf = require('graphology-gexf/browser');
 var QuadTree = require('../../scripts/quad-tree.js');
 
 function debounce(func, wait, immediate) {
@@ -515,11 +513,30 @@ angular.module('saveourair.view_upload', ['ngRoute'])
         var instant_speed_kph = 3600 * instant_speed_mps / 1000
 
         // Average point since 1 minute
-        /*var datapoints
-        datapoints = finalData.filter(function(d, i))
-        var currentXY =
-        var oneminute_speed_mps*/
-        // console.log(Math.round(instant_speed_kph * 100)/100)
+        var currentminuteDatapoints = finalData.filter(function(d2, i2){
+          return i2<i && d2.timestamp >= d.timestamp - 60*1000
+        })
+        var currentminuteXY = {x:d3.mean(currentminuteDatapoints, function(d2){return d2.x}), y:d3.mean(currentminuteDatapoints, function(d2){return d2.y})}
+        var currentminuteMeanTime = d3.mean(currentminuteDatapoints, function(d2){return d2.timestamp})
+
+        // Average point the minute before
+        var minutebeforeDatapoints = finalData.filter(function(d2, i2){
+          return i2<i && d2.timestamp >= d.timestamp - 2*60*1000 && d2.timestamp < d.timestamp - 60*1000
+        })
+        var minutebeforeXY = {x:d3.mean(minutebeforeDatapoints, function(d2){return d2.x}), y:d3.mean(minutebeforeDatapoints, function(d2){return d2.y})}
+        var minutebeforeMeanTime = d3.mean(minutebeforeDatapoints, function(d2){return d2.timestamp})
+
+        var oneminute_speed_mps
+        var oneminute_speed_kph
+        if (currentminuteXY.x && currentminuteXY.y && minutebeforeXY.x && minutebeforeXY.y) {
+          oneminute_speed_mps = haversine(currentminuteXY, minutebeforeXY) / ((currentminuteMeanTime - minutebeforeMeanTime) / 1000)
+          oneminute_speed_kph = 3600 * oneminute_speed_mps / 1000
+        } else {
+          oneminute_speed_kph = undefined
+        }
+
+        d.instantspeed = instant_speed_kph
+        d.smoothedspeed = oneminute_speed_kph
       }
     })
 
