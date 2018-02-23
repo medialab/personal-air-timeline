@@ -403,3 +403,86 @@ config(['$routeProvider', function($routeProvider) {
     }
   }
 })
+
+.directive('placesLine', function($timeout){
+  return {
+    restrict: 'E',
+    template: '<small style="opacity:0.5;">{{title}} loading...</small>',
+    scope: {
+      places: '=',
+      timelineData: '='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('places', redraw, true)
+      window.addEventListener('resize', redraw)
+      $scope.$on('$destroy', function(){
+        window.removeEventListener('resize', redraw)
+      })
+
+      var container = el
+
+      function redraw(){
+        $timeout(function(){
+          container.html('');
+
+          // Setup: dimensions
+          var margin = {top: 6, right: 6, bottom: 6, left: 60};
+          var width = container[0].offsetWidth - margin.left - margin.right;
+          var height = container[0].offsetHeight - margin.top - margin.bottom;
+
+          // While loading redraw may trigger before element being properly sized
+          if (width <= 0 || height <= 0) {
+            $timeout(redraw, 250)
+            return
+          }
+
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var x = d3.scaleTime()
+              .range([0, width])
+          
+          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+          
+          /* 
+
+          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+          g.append("path")
+              .datum($scope.timelineData)
+              .attr("fill", "none")
+              .attr("stroke", "black")
+              .attr("stroke-linejoin", "round")
+              .attr("stroke-linecap", "round")
+              .attr("stroke-width", 0.5)
+              .attr("d", line);
+
+          g.append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x))
+              .attr("class", "bwAxis")
+
+          g.append("g")
+              .call(d3.axisLeft(y))
+              .attr("class", "bwAxis")
+
+          g.append("text")
+              .attr('x', 0)
+              .attr('y', -40)
+              .attr("transform", "rotate(-90)")
+              .text($scope.title)
+              .attr("text-anchor", "end")
+              .attr("font-family", "Roboto Slab")
+              .attr("font-size", "14px")
+              .attr("fill", "black")*/
+        })
+      }
+    }
+  }
+})

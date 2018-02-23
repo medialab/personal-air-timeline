@@ -31,13 +31,18 @@ angular.module('saveourair.view_focus', ['ngRoute'])
   	}
 
   	function renderData(data){
-      data = data.filter(function(d){
+      dataprocess.consolidate(data)
+
+      $scope.staticPositions = dataprocess.staticPositions(data)
+      $scope.shortStaticPositions = $scope.staticPositions
+        .filter(function(d, i){ return i<5 }) // Max 5 places
+
+  		data = data.filter(function(d){
         return $scope.start <= d.timestamp
           && d.timestamp < $scope.end
       })
-      dataprocess.consolidate(data)
-
-  		$timeout(function(){
+      
+      $timeout(function(){
   			$scope.loading = false
   			
   			console.log('data', data)

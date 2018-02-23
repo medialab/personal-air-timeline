@@ -13,11 +13,13 @@
 			<h1>{{startDate}} - {{endDate}}</h1>
 		</div>
 		<div flex="50" class="md-padding" layout="column">
-			<bw-curve style="height: 100px;" timeline-data="timelineData" accessor="'DCE_PM25'"  title="'Modeled avg. PM2.5 at LatLng'"></bw-curve>
-      <bw-curve style="height: 100px;" timeline-data="timelineData" accessor="'DCE_PM10'"  title="'Modeled avg. PM10 at LatLng'"></bw-curve>
+			
+			<bw-curve style="height: 150px;" timeline-data="timelineData" accessor="'smoothedspeed'"  title="'SPEED'"></bw-curve>
+      <bw-curve style="height: 150px;" timeline-data="timelineData" accessor="'PM25'"  title="'PART. MATTER 2.5'"></bw-curve>
+
 		</div>
 		<div flex="40">
-			<leaflet-canvas data="timelineData"></leaflet-canvas>
+			<leaflet-canvas data="timelineData" places="shortStaticPositions"></leaflet-canvas>
 		</div>
 
 	</div>

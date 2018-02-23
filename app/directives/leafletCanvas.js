@@ -90,8 +90,8 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
               // Pen
               var inertia = Math.max(0, 0.95 - 0.1 * d.timestatic/timeForATurn)
-              pen.x = inertia * (pen.x||d_canvas.x) + (1-inertia) * d_canvas.x
-              pen.y = inertia * (pen.y||d_canvas.y) + (1-inertia) * d_canvas.y
+              pen.x = inertia * (pen.x || d_canvas.x) + (1-inertia) * d_canvas.x
+              pen.y = inertia * (pen.y || d_canvas.y) + (1-inertia) * d_canvas.y
 
               // Draw
               ctx.beginPath()
