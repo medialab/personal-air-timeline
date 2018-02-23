@@ -1,6 +1,7 @@
 var Leaflet = require('leaflet');
 
-angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanvas', [function() {
+angular.module('saveourair.directives.leafletCanvas', [])
+.directive('leafletCanvas', ['$timeout', function($timeout) {
   return {
     restrict: 'E',
     templateUrl: './directives/leaflet.html',
@@ -44,7 +45,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
         ]);
 
         // Canvas
-        redrawCanvas()
+        $timeout(redrawCanvas)
       }
 
       var div = el.find('div')[0];
@@ -126,11 +127,11 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
       ]);
 
       function redrawCanvas() {
-        console.log('Redraw Canvas')
+
         var data = $scope.data.filter(function(d) {
           return d.x && d.y;
         });
-        
+
         var ctx = canvas.getContext('2d')
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.lineCap="round"
