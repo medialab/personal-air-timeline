@@ -21,31 +21,35 @@ angular.module('saveourair.directives.leafletCanvas', [])
           return d.x && d.y;
         });
 
-        // Finding boundaries
-        var minX = Infinity,
-            maxX = -Infinity,
-            minY = Infinity,
-            maxY = -Infinity;
+        if (data.length > 1) {
 
-        data.forEach(function(d) {
-          if (d.x < minX)
-            minX = d.x;
-          if (d.x > maxX)
-            maxX = d.x;
+          // Finding boundaries
+          var minX = Infinity,
+              maxX = -Infinity,
+              minY = Infinity,
+              maxY = -Infinity;
 
-          if (d.y < minY)
-            minY = d.y;
-          if (d.y > maxY)
-            maxY = d.y;
-        });
+          data.forEach(function(d) {
+            if (d.x < minX)
+              minX = d.x;
+            if (d.x > maxX)
+              maxX = d.x;
 
-        $scope.map.fitBounds([
-          [minY, minX],
-          [maxY, maxX]
-        ]);
+            if (d.y < minY)
+              minY = d.y;
+            if (d.y > maxY)
+              maxY = d.y;
+          });
 
-        // Canvas
-        $timeout(redrawCanvas)
+          $scope.map.fitBounds([
+            [minY, minX],
+            [maxY, maxX]
+          ]);
+
+          // Canvas
+          $timeout(redrawCanvas)
+          
+        }
       }
 
       var div = el.find('div')[0];

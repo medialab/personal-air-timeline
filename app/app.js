@@ -656,7 +656,7 @@ config(['$routeProvider', function($routeProvider) {
 
           brush = d3.brushX()
               .extent([[0, 0], [width, height]])
-              .on('brush end', brushed)
+              .on('end', brushed)
 
           g.append("g")
             .attr("class", "brush")

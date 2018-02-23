@@ -20,9 +20,12 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 
     function updateDates(){
       if ($scope.start && $scope.end) {
-        $scope.startDate = titleFormatDate(new Date($scope.start))
-        $scope.endDate = titleFormatDate(new Date($scope.end))
-        filterData()
+        $timeout(function(){
+          $scope.startDate = titleFormatDate(new Date($scope.start))
+          $scope.endDate = titleFormatDate(new Date($scope.end))
+          $scope.filteredTimelineData = []
+          filterData()
+        })
       }
     }
 
