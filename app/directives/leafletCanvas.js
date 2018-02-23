@@ -65,7 +65,6 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           var lastStaticPositionThreshold = 10
           var timeForATurn = 5*60*1000 // Five minutes
           var jitter
-          var inertia = 0.9
           var randomDeviation = 0
           var randomDeviation2 = 0
           var pen = {x:undefined, y:undefined}
@@ -84,7 +83,6 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
               } else {
                 // On the move!
                 lastStaticPosition = undefined
-                jitter = 0
                 timeThere = 0
               }
             }
@@ -95,8 +93,8 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             // Rotation jitter
             var angle = (2*Math.PI*d.timestamp/300000)%(2*Math.PI) // One turn every 5 minutes
-            jitter = 24 * Math.sqrt(timeThere/timeForATurn) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
-            
+            jitter = 8 * Math.pow(timeThere/timeForATurn, .65) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
+
             d_canvas.x += jitter * Math.cos(angle) + 0.2 * randomDeviation
             d_canvas.y += jitter * Math.sin(angle) + 0.2 * randomDeviation2
 
@@ -106,6 +104,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
               opacity = Math.round(opacity * 1000)/1000
 
               // Pen
+              var inertia = Math.max(0, 0.95 - 0.1 * timeThere/timeForATurn)
               pen.x = inertia * (pen.x||d_canvas.x) + (1-inertia) * d_canvas.x
               pen.y = inertia * (pen.y||d_canvas.y) + (1-inertia) * d_canvas.y
 
