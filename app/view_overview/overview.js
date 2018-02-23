@@ -11,7 +11,7 @@ angular.module('saveourair.view_overview', ['ngRoute'])
 
 .controller('OverviewCtrl', function($scope, $timeout, $location, store, dataprocess) {
   	$scope.loading = true
-  	
+
   	if (store.get('reconciledData')) {
   		renderData(store.get('reconciledData'))
   	} else {
@@ -28,13 +28,12 @@ angular.module('saveourair.view_overview', ['ngRoute'])
 
       dataprocess.consolidate(data)
       $scope.staticPositions = dataprocess.staticPositions(data)
-      $scope.shortStaticPositions = $scope.staticPositions
-        .filter(function(d, i){ return i<5 }) // Max 5 places
+      $scope.shortStaticPositions = $scope.staticPositions.slice(0, 5) // Max 5 places
       console.log($scope.staticPositions)
 
   		$timeout(function(){
   			$scope.loading = false
-  			
+
   			// console.log('data', data)
   			// window.data = data
 
