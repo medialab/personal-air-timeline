@@ -92,6 +92,7 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 
       var hours = date.getHours();
       var minutes = date.getMinutes();
+      if ((''+minutes).length == 1) { minutes = '0' + minutes }
 
       return day + ' ' + monthNames[monthIndex] + ' ' + year + ' ' + hours + ':' + minutes;
     }
