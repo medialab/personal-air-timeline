@@ -12,10 +12,16 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 .controller('FocusCtrl', function($scope, $timeout, $location, $routeParams, store, dataprocess) {
   	$scope.loading = true
 
+    var dateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
+
   	if (store.get('reconciledData')) {
   		renderData(store.get('reconciledData'))
   	} else {
       if ($routeParams.start && $routeParams.end) {
+
+        if (!dateRegex.test($routeParams.start) || !dateRegex.test($routeParams.end))
+          alert('Invalid date. Format is YYYY-MM-DDTmm:ss');
+
         $scope.start = +parseDate($routeParams.start)
         $scope.end = +parseDate($routeParams.end)
       }
