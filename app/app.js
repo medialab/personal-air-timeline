@@ -560,3 +560,70 @@ config(['$routeProvider', function($routeProvider) {
     }
   }
 })
+
+.directive('overBrush', function($timeout){
+  return {
+    restrict: 'E',
+    template: '<div style="position:absolute; top:0; width:170mm; height:80px"></div>',
+    scope: {
+      timelineData: '='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('timelineData', redraw, true)
+      window.addEventListener('resize', redraw)
+      $scope.$on('$destroy', function(){
+        window.removeEventListener('resize', redraw)
+      })
+
+      var container = el.find('div')
+
+      function redraw(){
+        $timeout(function(){
+          container.html('');
+
+          // Setup: dimensions
+          var margin = {top: 0, right: 0, bottom: 0, left: 60};
+          var width = container[0].offsetWidth - margin.left - margin.right;
+          var height = container[0].offsetHeight - margin.top - margin.bottom;
+
+          // // While loading redraw may trigger before element being properly sized
+          if (width <= 0 || height <= 0) {
+            $timeout(redraw, 250)
+            return
+          }
+
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var x = d3.scaleTime()
+              .range([0, width])
+              .domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+
+          var brush = d3.brushX()
+              .extent([[0, 0], [width, height]])
+              .on('brush end', brushed)
+
+          g.append("g")
+            .attr("class", "brush")
+            .call(brush)
+            .call(brush.move, x.range());
+
+          function brushed() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+            var s = d3.event.selection || x.range();
+
+            // console.log(s, x.invert(s[0]), x.invert(s[1]))
+          }
+
+
+        })
+      }
+    }
+  }
+})

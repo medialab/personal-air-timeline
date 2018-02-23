@@ -206,3 +206,8 @@ leaflet-canvas .leaflet-container{
   /* Load the fonts we plan to use in the canvas */
   font-family: 'Roboto Slab', sans-serif;
 }
+
+/* Brush */
+.brush .overlay {
+  
+}
