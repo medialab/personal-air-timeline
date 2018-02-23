@@ -208,6 +208,9 @@ leaflet-canvas .leaflet-container{
 }
 
 /* Brush */
-.brush .overlay {
-  
+.brush .selection {
+  fill: #FFF;
+  fill-opacity: 0;
+  stroke: #000;
+  stroke-width: 5;
 }

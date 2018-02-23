@@ -582,7 +582,7 @@ config(['$routeProvider', function($routeProvider) {
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 0, right: 0, bottom: 0, left: 60};
+          var margin = {top: 3, right: 0, bottom: 3, left: 60};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
