@@ -115,13 +115,13 @@ config(['$routeProvider', function($routeProvider) {
     // Compute when static
     var lastStaticPosition
     var lastStaticPositionThreshold = 100
-    var idleTimeInterval = Infinity//5*60*1000
+    var idleTimeInterval = 5*60*1000
     data.forEach(function(d, i){
 
       // Distance to last static position
       if (lastStaticPosition) {
         var dist = ns.haversine(d, lastStaticPosition)
-        if (dist < lastStaticPositionThreshold && d.timestamp - lastStaticPosition.timestamp < idleTimeInterval) {
+        if (dist < lastStaticPositionThreshold && i>0 && Math.abs(d.timestamp - data[i-1].timestamp) < idleTimeInterval) {
           // Still at the same place
           d.timestatic = d.timestamp - lastStaticPosition.timestamp
         } else {
