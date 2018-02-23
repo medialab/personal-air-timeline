@@ -179,9 +179,9 @@ a:active  {
 }
 .a4page h1 {
   font-family: 'Roboto Slab', serif;
-  font-weight: 100;
+  font-weight: 300;
   margin: 0;
-  font-size: 28px;
+  font-size: 32px;
 }
 .a4page .bwAxis line, .a4page .bwAxis path {
   stroke-width: 0.5px;
