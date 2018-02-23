@@ -88,10 +88,57 @@ config(['$routeProvider', function($routeProvider) {
       d.DCE_PM10 = +d.DCE_PM10 || undefined
       d.x = +d.x || undefined
       d.y = +d.y || undefined
+      d.instantspeed = +d.instantspeed || undefined
+      d.smoothedspeed = +d.smoothedspeed || undefined
       var defined = d_prev && d.timestamp - d_prev.timestamp < fiveminutesms
       d_prev = d
       d.def = defined
     })
+
+    // Compute when static
+    var lastStaticPosition
+    var lastStaticPositionThreshold = 100
+    data.forEach(function(d, i){
+
+      // Distance to last static position
+      if (lastStaticPosition) {
+        var dist = ns.haversine(d, lastStaticPosition)
+        if (dist < lastStaticPositionThreshold) {
+          // Still at the same place
+          d.timestatic = d.timestamp - lastStaticPosition.timestamp
+        } else {
+          // On the move!
+          lastStaticPosition = undefined
+          d.timestatic = 0
+        }
+      }
+
+      // Look at last static position
+      if (lastStaticPosition === undefined) {
+        lastStaticPosition = {x:d.x, y:d.y, timestamp:d.timestamp}
+      }
+    })
+  }
+
+  // Distance in meters between two lat long points as {x, y}
+  ns.haversine = function(a, b) {
+    if (a.x === b.x && a.y === b.y)
+      return 0;
+
+    var R = Math.PI / 180;
+
+    var lon1 = a.y * R,
+        lat1 = a.x * R,
+        lon2 = b.y * R,
+        lat2 = b.x * R;
+
+    var dlon = lon2 - lon1,
+        dlat = lat2 - lat1,
+        a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2),
+        c = 2 * Math.asin(Math.sqrt(a)),
+        km = 6371 * c;
+
+    return km * 1000;
   }
   return ns
 })
