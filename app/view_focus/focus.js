@@ -64,7 +64,7 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       $scope.shortStaticPositions = $scope.staticPositions
         .filter(function(d, i){ return i<5 }) // Max 5 places
 
-  		data = data.filter(function(d){
+  		var filteredData = data.filter(function(d){
         return $scope.start <= d.timestamp
           && d.timestamp < $scope.end
       })
@@ -72,10 +72,8 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       $timeout(function(){
   			$scope.loading = false
 
-  			console.log('data', data)
-  			window.data = data
-
-  			$scope.timelineData = data
+        $scope.timelineData = data
+  			$scope.filteredTimelineData = filteredData
   		})
   	}
 
