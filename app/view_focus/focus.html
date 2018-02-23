@@ -13,7 +13,7 @@
 		<div style="height: 80px; background-color: #CCC;" layout="column">
       <bw-curve style="height: 30px" timeline-data="timelineData" accessor="'PM10'" title="" noscale="true"></bw-curve>
 			<places-line style="height: 50px" timeline-data="timelineData" places="shortStaticPositions"></places-line>
-			<over-brush timeline-data="timelineData"></over-brush>
+			<over-brush timeline-data="timelineData" begin="$parent.start" end="$parent.end"></over-brush>
 		</div>
 		
 		<div layout="column" flex>

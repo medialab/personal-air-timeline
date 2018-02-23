@@ -584,10 +584,14 @@ config(['$routeProvider', function($routeProvider) {
     restrict: 'E',
     template: '<div style="position:absolute; top:0; width:170mm; height:80px"></div>',
     scope: {
-      timelineData: '='
+      timelineData: '=',
+      begin:'=',
+      end:'='
     },
     link: function($scope, el, attrs) {
-      $scope.$watch('timelineData', redraw, true)
+      $scope.$watch('timelineData', init, true)
+      $scope.$watch('begin', redraw, true)
+      $scope.$watch('end', redraw, true)
       window.addEventListener('resize', redraw)
       $scope.$on('$destroy', function(){
         window.removeEventListener('resize', redraw)
@@ -595,20 +599,24 @@ config(['$routeProvider', function($routeProvider) {
 
       var container = el.find('div')
 
-      function redraw(){
+      var brush, x, width, height
+
+      function redraw() {
+        if (brush) {
+          brush.extent([x($scope.begin), x($scope.end), height])
+          // brush(d3.select(".brush").transition())
+          // brush.event(d3.select(".brush").transition().delay(1000))
+        }
+      }
+
+      function init(){
         $timeout(function(){
           container.html('');
 
           // Setup: dimensions
           var margin = {top: 3, right: 0, bottom: 3, left: 60};
-          var width = container[0].offsetWidth - margin.left - margin.right;
-          var height = container[0].offsetHeight - margin.top - margin.bottom;
-
-          // // While loading redraw may trigger before element being properly sized
-          if (width <= 0 || height <= 0) {
-            $timeout(redraw, 250)
-            return
-          }
+          width = container[0].offsetWidth - margin.left - margin.right;
+          height = container[0].offsetHeight - margin.top - margin.bottom;
 
           var svg = d3.select(container[0])
             .append('svg')
@@ -621,7 +629,7 @@ config(['$routeProvider', function($routeProvider) {
 
           var extent = d3.extent($scope.timelineData, function(d) { return d.timestamp; })
 
-          var x = d3.scaleTime()
+          x = d3.scaleTime()
               .range([0, width])
               .domain(extent);
 
@@ -638,17 +646,14 @@ config(['$routeProvider', function($routeProvider) {
             if (+startDate === extent[0] && +endDate === extent[1])
               return;
 
-            var startDateString = startDate.toISOString().split(/:\d{2}\./)[0]
-            var endDateString = endDate.toISOString().split(/:\d{2}\./)[0]
-            console.log(startDateString + '/' + endDateString)
-            $timeout(function() {
-              // $route.updateParams({start: startDateString, end: endDateString})
-              $location.url('/focus/' + startDateString + '/' + endDateString)
+            $timeout(function(){
+              $scope.begin = startDate.getTime()
+              $scope.end = endDate.getTime()
             })
 
           }, 300);
 
-          var brush = d3.brushX()
+          brush = d3.brushX()
               .extent([[0, 0], [width, height]])
               .on('brush end', brushed)
 
@@ -656,6 +661,8 @@ config(['$routeProvider', function($routeProvider) {
             .attr("class", "brush")
             .call(brush)
             .call(brush.move, x.range());
+
+          redraw()
         })
       }
     }
