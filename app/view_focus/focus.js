@@ -3,24 +3,31 @@
 angular.module('saveourair.view_focus', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/focus', {
+  $routeProvider.when('/focus/:start?/:end?', {
     templateUrl: 'view_focus/focus.html',
     controller: 'FocusCtrl'
   });
 }])
 
-.controller('FocusCtrl', function($scope, $timeout, $location, store, dataprocess) {
+.controller('FocusCtrl', function($scope, $timeout, $location, $routeParams, store, dataprocess) {
   	$scope.loading = true
-  	
+
   	if (store.get('reconciledData')) {
   		renderData(store.get('reconciledData'))
   	} else {
-      var centralTimestamp = 1518909277000 + 60*60*1000;
-      $scope.start = centralTimestamp - 300*60*1000
-      $scope.end = centralTimestamp + 300*60*1000
+      if ($routeParams.start && $routeParams.end) {
+        $scope.start = +parseDate($routeParams.start)
+        $scope.end = +parseDate($routeParams.end)
+      }
+      else {
+        var centralTimestamp = 1518909277000 + 60*60*1000;
+        $scope.start = centralTimestamp - 300*60*1000
+        $scope.end = centralTimestamp + 300*60*1000
+      }
+
       $scope.startDate = titleFormatDate(new Date($scope.start))
       $scope.endDate = titleFormatDate(new Date($scope.end))
-  		
+
       // DEV MODE: load test data
 			d3.csv('data/test.csv', renderData)
 
@@ -29,6 +36,20 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       $location.url('/upload')
     }, 0)*/
   	}
+
+    function parseDate(string) {
+      var split = string.split('T')
+      var date = split[0].split('-')
+      var time = split[1].split(':')
+
+      return new Date(
+        (+date[0]),
+        (+date[1])-1, // Careful, month starts at 0!
+        (+date[2]),
+        (+time[0]),
+        (+time[1])
+      )
+    }
 
   	function renderData(data){
       dataprocess.consolidate(data)
@@ -41,10 +62,10 @@ angular.module('saveourair.view_focus', ['ngRoute'])
         return $scope.start <= d.timestamp
           && d.timestamp < $scope.end
       })
-      
+
       $timeout(function(){
   			$scope.loading = false
-  			
+
   			console.log('data', data)
   			window.data = data
 
