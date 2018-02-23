@@ -9,6 +9,16 @@
 <!-- Loaded -->
 <md-content class="md-padding" layout="column" layout-fill ng-if="!loading">
 
+  <md-button class="md-raised md-primary" ng-href="#!/focus">
+    <md-icon>print</md-icon>
+    Data print sheet
+  </md-button>
+
+	<md-button class="md-raised" ng-click="download()">
+    <md-icon>file_download</md-icon>
+    Download data
+  </md-button>
+
 	<timeline-summary-card timeline-data="timelineData"></timeline-summary-card>
 	<leaflet-card timeline-data="timelineData"></leaflet-card>
 
