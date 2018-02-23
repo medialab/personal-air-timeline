@@ -468,6 +468,20 @@ config(['$routeProvider', function($routeProvider) {
           
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
           
+          $scope.places.forEach(function(place){
+            place.stays.forEach(function(stay){
+              g.append("line")
+                  .attr("x1", x(stay.begin))
+                  .attr("y1", 0)
+                  .attr("x2", x(stay.end))
+                  .attr("y2", 0)
+                  .attr("stroke", "black")
+                  .attr("stroke-linejoin", "round")
+                  .attr("stroke-linecap", "round")
+                  .attr("stroke-width", 0.5)
+            })
+          })
+
           /* 
 
           g.append("path")
