@@ -8,11 +8,12 @@
 
 <!-- Loaded -->
 <div ng-if="!loading" class="page-container">
-	<div class="a4page" layout="column">
+	<div class="a4page" layout="column" style="position: relative">
 
 		<div style="height: 80px; background-color: #CCC;" layout="column">
-      <bw-curve style="height: 30px; opacity:0.6" timeline-data="timelineData" accessor="'PM10'" title="" noscale="true"></bw-curve>
-			<places-line style="height: 50px; opacity:0.6" timeline-data="timelineData" places="shortStaticPositions"></places-line>
+      <bw-curve style="height: 30px" timeline-data="timelineData" accessor="'PM10'" title="" noscale="true"></bw-curve>
+			<places-line style="height: 50px" timeline-data="timelineData" places="shortStaticPositions"></places-line>
+			<over-brush timeline-data="timelineData" begin="$parent.start" end="$parent.end"></over-brush>
 		</div>
 		
 		<div layout="column" flex>
@@ -28,7 +29,7 @@
 
 		</div>
 
-		<div style="height: 300px">
+		<div style="height: 390px">
 			<leaflet-canvas data="filteredTimelineData" places="shortStaticPositions"></leaflet-canvas>
 		</div>
 

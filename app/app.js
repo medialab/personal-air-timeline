@@ -23,6 +23,23 @@ require('./view_board/board.js');
 require('./view_overview/overview.js');
 require('./view_focus/focus.js');
 
+// Helpers
+// TODO: we should rely on a proper dep rather than copying this each time
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 // Declare app level module which depends on views, and components
 angular.module('saveourair', [
   'ngRoute',
@@ -98,12 +115,13 @@ config(['$routeProvider', function($routeProvider) {
     // Compute when static
     var lastStaticPosition
     var lastStaticPositionThreshold = 100
+    var idleTimeInterval = 5*60*1000
     data.forEach(function(d, i){
 
       // Distance to last static position
       if (lastStaticPosition) {
         var dist = ns.haversine(d, lastStaticPosition)
-        if (dist < lastStaticPositionThreshold) {
+        if (dist < lastStaticPositionThreshold && i>0 && Math.abs(d.timestamp - data[i-1].timestamp) < idleTimeInterval) {
           // Still at the same place
           d.timestatic = d.timestamp - lastStaticPosition.timestamp
         } else {
@@ -161,7 +179,7 @@ config(['$routeProvider', function($routeProvider) {
       place.duration = d3.sum(place.stays, function(stay){ return stay.end - stay.begin })
       place.stays.forEach(function(stay){
         place.begin = Math.min(place.begin || stay.begin, stay.begin)
-        place.end = Math.max(place.end || stay.end, stay.end)        
+        place.end = Math.max(place.end || stay.end, stay.end)
       })
     })
     places.sort(function(a, b){ return a.begin - b.begin })
@@ -435,6 +453,7 @@ config(['$routeProvider', function($routeProvider) {
     },
     link: function($scope, el, attrs) {
       $scope.$watch('places', redraw, true)
+      $scope.$watch('timelineData', redraw, true)
       window.addEventListener('resize', redraw)
       $scope.$on('$destroy', function(){
         window.removeEventListener('resize', redraw)
@@ -468,9 +487,9 @@ config(['$routeProvider', function($routeProvider) {
 
           var x = d3.scaleTime()
               .range([0, width])
-          
+
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
-          
+
           // Background line
           g.append("line")
               .attr("x1", 0)
@@ -524,9 +543,9 @@ config(['$routeProvider', function($routeProvider) {
                   .attr("fill", "black")
             })
           })
-          
 
-          /* 
+
+          /*
 
           g.append("path")
               .datum($scope.timelineData)
@@ -555,6 +574,96 @@ config(['$routeProvider', function($routeProvider) {
               .attr("font-family", "Roboto Slab")
               .attr("font-size", "14px")
               .attr("fill", "black")*/
+        })
+      }
+    }
+  }
+})
+
+.directive('overBrush', function($timeout, $location, $route){
+  return {
+    restrict: 'E',
+    template: '<div style="position:absolute; top:0; width:170mm; height:80px"></div>',
+    scope: {
+      timelineData: '=',
+      begin:'=',
+      end:'='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('timelineData', init, true)
+      $scope.$watch('begin', redraw, true)
+      $scope.$watch('end', redraw, true)
+      window.addEventListener('resize', redraw)
+      $scope.$on('$destroy', function(){
+        window.removeEventListener('resize', redraw)
+      })
+
+      var container = el.find('div')
+
+      var brush, x, width, height
+
+      function redraw() {
+        if (brush) {
+          brush.extent([x($scope.begin), x($scope.end), height])
+          // brush(d3.select(".brush").transition())
+          // brush.event(d3.select(".brush").transition().delay(1000))
+        }
+      }
+
+      function init(){
+        $timeout(function(){
+          container.html('');
+
+          // Setup: dimensions
+          var margin = {top: 3, right: 0, bottom: 3, left: 60};
+          width = container[0].offsetWidth - margin.left - margin.right;
+          height = container[0].offsetHeight - margin.top - margin.bottom;
+
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var extent = d3.extent($scope.timelineData, function(d) { return d.timestamp; })
+
+          x = d3.scaleTime()
+              .range([0, width])
+              .domain(extent);
+
+          var brushed = function() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+            var s = d3.event.selection || x.range();
+            update(s);
+          }
+
+          var update = debounce(function(s) {
+            var startDate = x.invert(s[0])
+            var endDate = x.invert(s[1])
+
+            if (+startDate === extent[0] && +endDate === extent[1])
+              return;
+
+            $timeout(function(){
+              $scope.begin = startDate.getTime()
+              $scope.end = endDate.getTime()
+            })
+
+          }, 300);
+
+          brush = d3.brushX()
+              .extent([[0, 0], [width, height]])
+              .on('end', brushed)
+
+          g.append("g")
+            .attr("class", "brush")
+            .call(brush)
+            .call(brush.move, x.range());
+
+          redraw()
         })
       }
     }

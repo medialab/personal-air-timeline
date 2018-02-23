@@ -3,9 +3,10 @@
 angular.module('saveourair.view_focus', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/focus/:start?/:end?', {
+  $routeProvider.when('/focus/', {
     templateUrl: 'view_focus/focus.html',
-    controller: 'FocusCtrl'
+    controller: 'FocusCtrl',
+    reloadOnSearch: false
   });
 }])
 
@@ -14,13 +15,27 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 
     var dateRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
 
-  	if (store.get('reconciledData')) {
-  		renderData(store.get('reconciledData'))
-  	} else {
+    $scope.$watch('start', updateDates)
+    $scope.$watch('end', updateDates)
+
+    function updateDates(){
+      if ($scope.start && $scope.end) {
+        $timeout(function(){
+          $scope.startDate = titleFormatDate(new Date($scope.start))
+          $scope.endDate = titleFormatDate(new Date($scope.end))
+          $scope.filteredTimelineData = []
+          filterData()
+        })
+      }
+    }
+
+    if (store.get('reconciledData')) {
+      renderData(store.get('reconciledData'))
+    } else {
       if ($routeParams.start && $routeParams.end) {
 
         if (!dateRegex.test($routeParams.start) || !dateRegex.test($routeParams.end))
-          alert('Invalid date. Format is YYYY-MM-DDTmm:ss');
+          alert('Invalid date. Format is YYYY-MM-DDThh:mm');
 
         $scope.start = +parseDate($routeParams.start)
         $scope.end = +parseDate($routeParams.end)
@@ -34,12 +49,12 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 
 
       // DEV MODE: load test data
-			d3.csv('data/test.csv', renderData)
+			// d3.csv('data/test.csv', renderData)
 
 			// PROD MODE: redirect to upload page
-			/*$timeout(function(){
-      $location.url('/upload')
-    }, 0)*/
+			$timeout(function(){
+        $location.url('/upload')
+      }, 0)
   	}
 
     function parseDate(string) {
@@ -63,25 +78,32 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       $scope.shortStaticPositions = $scope.staticPositions
         .filter(function(d, i){ return i<5 }) // Max 5 places
 
+      $scope.timelineData = data
+
+      filterData()
+  	}
+
+    function filterData() {
       if ($scope.start === undefined) {
-        $scope.start = data[0].timestamp
-        $scope.end = data[data.length - 1].timestamp
+        $scope.start = $scope.timelineData[0].timestamp
+        $scope.end = $scope.timelineData[$scope.timelineData.length - 1].timestamp
         $scope.startDate = titleFormatDate(new Date($scope.start))
         $scope.endDate = titleFormatDate(new Date($scope.end))
       }
 
-  		var filteredData = data.filter(function(d){
-        return $scope.start <= d.timestamp
-          && d.timestamp < $scope.end
-      })
+      if ($scope.timelineData) {
+        var filteredData = $scope.timelineData.filter(function(d){
+          return $scope.start <= d.timestamp
+            && d.timestamp < $scope.end
+        })
 
-      $timeout(function(){
-  			$scope.loading = false
+        $timeout(function(){
+          $scope.loading = false
 
-        $scope.timelineData = data
-  			$scope.filteredTimelineData = filteredData
-  		})
-  	}
+          $scope.filteredTimelineData = filteredData
+        })
+      }
+    }
 
     //
     function titleFormatDate(date) {
