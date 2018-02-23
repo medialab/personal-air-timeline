@@ -20,6 +20,7 @@ require('./directives/leaflet.js');
 require('./directives/leafletCanvas.js');
 require('./view_upload/upload.js');
 require('./view_board/board.js');
+require('./view_overview/overview.js');
 require('./view_focus/focus.js');
 
 // Declare app level module which depends on views, and components
@@ -31,6 +32,7 @@ angular.module('saveourair', [
   'saveourair.directives.leafletCanvas',
   'saveourair.view_upload',
   'saveourair.view_board',
+  'saveourair.view_overview',
   'saveourair.view_focus'
 ]).
 config(['$routeProvider', function($routeProvider) {

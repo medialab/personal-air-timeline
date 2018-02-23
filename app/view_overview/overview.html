@@ -1,0 +1,24 @@
+<!-- Loading -->
+<div layout="column" layout-fill ng-if="loading" layout-align="center center">
+  <md-progress-circular
+    md-diameter="42"
+    md-mode="indeterminate"
+  ></md-progress-circular>
+</div>
+
+<!-- Loaded -->
+<div ng-if="!loading" class="page-container">
+	<div class="a4page" layout="column">
+		<div flex="10" layout-padding>
+			<h1>{{startDate}} - {{endDate}}</h1>
+		</div>
+		<div flex="50" class="md-padding" layout="column">
+			<bw-curve style="height: 100px;" timeline-data="timelineData" accessor="'DCE_PM25'"  title="'Modeled avg. PM2.5 at LatLng'"></bw-curve>
+      <bw-curve style="height: 100px;" timeline-data="timelineData" accessor="'DCE_PM10'"  title="'Modeled avg. PM10 at LatLng'"></bw-curve>
+		</div>
+		<div flex="40">
+			<leaflet-canvas data="timelineData"></leaflet-canvas>
+		</div>
+
+	</div>
+</div>
