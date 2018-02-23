@@ -200,3 +200,9 @@ leaflet-canvas .leaflet-tile-pane .leaflet-layer{
 leaflet-canvas .leaflet-container{
   background-color: #FFF !important;
 }
+
+/* Fonts loading */
+#dummy-font-div {
+  /* Load the fonts we plan to use in the canvas */
+  font-family: 'Roboto Slab', sans-serif;
+}

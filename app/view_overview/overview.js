@@ -28,6 +28,8 @@ angular.module('saveourair.view_overview', ['ngRoute'])
 
       dataprocess.consolidate(data)
       $scope.staticPositions = dataprocess.staticPositions(data)
+      $scope.shortStaticPositions = $scope.staticPositions
+        .filter(function(d, i){ return i<5 }) // Max 5 places
       console.log($scope.staticPositions)
 
   		$timeout(function(){

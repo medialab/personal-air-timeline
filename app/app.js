@@ -159,12 +159,17 @@ config(['$routeProvider', function($routeProvider) {
     // Consolidate places
     places.forEach(function(place){
       place.duration = d3.sum(place.stays, function(stay){ return stay.end - stay.begin })
+      place.stays.forEach(function(stay){
+        place.begin = Math.min(place.begin || stay.begin, stay.begin)
+        place.end = Math.max(place.end || stay.end, stay.end)        
+      })
     })
-    places.sort(function(a, b){ return b.duration - a.duration })
+    places.sort(function(a, b){ return a.begin - b.begin })
     var alphabet = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().split('')
     places.forEach(function(place, i){
       place.name = alphabet[i%alphabet.length]
     })
+    places.sort(function(a, b){ return b.duration - a.duration })
 
     return places
   }

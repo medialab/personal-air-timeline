@@ -5,7 +5,8 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
     restrict: 'E',
     templateUrl: './directives/leaflet.html',
     scope: {
-      data: '='
+      data: '=',
+      places: '='
     },
     link: function($scope, el, attrs) {
       var div = el.find('div')[0];
@@ -105,6 +106,28 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             lastPosition = {x:pen.x, y:pen.y}
 
+          })
+
+          // Draw places
+          ctx.lineCap="round"
+          ctx.lineJoin="round"
+          var yOffset = 25
+          $scope.places.forEach(function(place){
+            var place_canvas = pos(place)
+            ctx.font = "80px Roboto Slab";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "black";
+            ctx.fillText(place.name, place_canvas.x, place_canvas.y + yOffset);
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 25;
+            ctx.strokeText(place.name, place_canvas.x, place_canvas.y + yOffset);
+          })
+          $scope.places.forEach(function(place){
+            var place_canvas = pos(place)
+            ctx.font = "80px Roboto Slab";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "white";
+            ctx.fillText(place.name, place_canvas.x, place_canvas.y + yOffset);
           })
         }
       });
