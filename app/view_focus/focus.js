@@ -24,15 +24,14 @@ angular.module('saveourair.view_focus', ['ngRoute'])
 
         $scope.start = +parseDate($routeParams.start)
         $scope.end = +parseDate($routeParams.end)
+        $scope.startDate = titleFormatDate(new Date($scope.start))
+        $scope.endDate = titleFormatDate(new Date($scope.end))
       }
       else {
-        var centralTimestamp = 1518909277000 + 60*60*1000;
-        $scope.start = centralTimestamp - 300*60*1000
-        $scope.end = centralTimestamp + 300*60*1000
+        $scope.start = undefined
+        $scope.end = undefined
       }
 
-      $scope.startDate = titleFormatDate(new Date($scope.start))
-      $scope.endDate = titleFormatDate(new Date($scope.end))
 
       // DEV MODE: load test data
 			d3.csv('data/test.csv', renderData)
@@ -63,6 +62,13 @@ angular.module('saveourair.view_focus', ['ngRoute'])
       $scope.staticPositions = dataprocess.staticPositions(data)
       $scope.shortStaticPositions = $scope.staticPositions
         .filter(function(d, i){ return i<5 }) // Max 5 places
+
+      if ($scope.start === undefined) {
+        $scope.start = data[0].timestamp
+        $scope.end = data[data.length - 1].timestamp
+        $scope.startDate = titleFormatDate(new Date($scope.start))
+        $scope.endDate = titleFormatDate(new Date($scope.end))
+      }
 
   		var filteredData = data.filter(function(d){
         return $scope.start <= d.timestamp
