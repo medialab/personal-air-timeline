@@ -27,12 +27,14 @@ angular.module('saveourair.view_overview', ['ngRoute'])
   	function renderData(data){
 
       dataprocess.consolidate(data)
+      $scope.staticPositions = dataprocess.staticPositions(data)
+      console.log($scope.staticPositions)
 
   		$timeout(function(){
   			$scope.loading = false
   			
-  			console.log('data', data)
-  			window.data = data
+  			// console.log('data', data)
+  			// window.data = data
 
   			$scope.timelineData = data
   		})

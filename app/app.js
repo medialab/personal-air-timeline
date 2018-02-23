@@ -120,6 +120,55 @@ config(['$routeProvider', function($routeProvider) {
     })
   }
 
+  ns.staticPositions = function(data) {
+    // Compute when ego stayed at the same place for a time
+    var stays = []
+    var currentStaticPosition
+    var staticThreshold = 10 * 60 * 1000 // Ten minutes to stay at the same place
+    data.forEach(function(d){
+      if (d.timestatic > staticThreshold && d.x && d.y) {
+        if (currentStaticPosition == undefined) {
+          currentStaticPosition = {x:d.x, y:d.y, begin:d.timestamp, end:d.timestamp}
+        } else {
+          currentStaticPosition.end = d.timestamp
+        }
+      } else {
+        if (currentStaticPosition) {
+          stays.push(currentStaticPosition)
+          currentStaticPosition = undefined
+        }
+      }
+    })
+
+    // Get places from the stays
+    var places = []
+    var samePlaceThreshold = 100
+    stays.forEach(function(stay){
+      // Search for an existing place
+      var existing = places.some(function(place){
+        if (ns.haversine(place, stay) < samePlaceThreshold) {
+          place.stays.push(stay)
+          return true
+        }
+      })
+      if (!existing) {
+        places.push({x:stay.x, y:stay.y, stays:[stay]})
+      }
+    })
+
+    // Consolidate places
+    places.forEach(function(place){
+      place.duration = d3.sum(place.stays, function(stay){ return stay.end - stay.begin })
+    })
+    places.sort(function(a, b){ return b.duration - a.duration })
+    var alphabet = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().split('')
+    places.forEach(function(place, i){
+      place.name = alphabet[i%alphabet.length]
+    })
+
+    return places
+  }
+
   // Distance in meters between two lat long points as {x, y}
   ns.haversine = function(a, b) {
     if (a.x === b.x && a.y === b.y)

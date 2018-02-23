@@ -61,8 +61,6 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           ctx.lineCap="round"
 
           var lastPosition
-          var lastStaticPosition
-          var lastStaticPositionThreshold = 10
           var timeForATurn = 5*60*1000 // Five minutes
           var jitter
           var randomDeviation = 0
@@ -73,27 +71,13 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             var d_canvas = pos(d)
 
-            // Distance to last static position
-            var timeThere
-            if (lastStaticPosition) {
-              var dist = Math.sqrt(Math.pow(lastStaticPosition.x - d_canvas.x, 2) + Math.pow(lastStaticPosition.x - d_canvas.x, 2))
-              if (dist < lastStaticPositionThreshold) {
-                // Still at the same place
-                timeThere = d.timestamp - lastStaticPosition.timestamp
-              } else {
-                // On the move!
-                lastStaticPosition = undefined
-                timeThere = 0
-              }
-            }
-
             // Update random deviation
             randomDeviation  = 0.9 * randomDeviation  + (Math.random() - 0.5)
             randomDeviation2 = 0.9 * randomDeviation2 + (Math.random() - 0.5)
 
             // Rotation jitter
             var angle = (2*Math.PI*d.timestamp/300000)%(2*Math.PI) // One turn every 5 minutes
-            jitter = 8 * Math.pow(timeThere/timeForATurn, .65) * Math.sin(2.9 * timeThere/timeForATurn + 0.1 * randomDeviation) // Pixels
+            jitter = 8 * Math.pow(d.timestatic/timeForATurn, .65) * Math.sin(2.9 * d.timestatic/timeForATurn + 0.1 * randomDeviation) // Pixels
 
             d_canvas.x += jitter * Math.cos(angle) + 0.2 * randomDeviation
             d_canvas.y += jitter * Math.sin(angle) + 0.2 * randomDeviation2
@@ -104,7 +88,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
               opacity = Math.round(opacity * 1000)/1000
 
               // Pen
-              var inertia = Math.max(0, 0.95 - 0.1 * timeThere/timeForATurn)
+              var inertia = Math.max(0, 0.95 - 0.1 * d.timestatic/timeForATurn)
               pen.x = inertia * (pen.x||d_canvas.x) + (1-inertia) * d_canvas.x
               pen.y = inertia * (pen.y||d_canvas.y) + (1-inertia) * d_canvas.y
 
@@ -121,10 +105,6 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             lastPosition = {x:pen.x, y:pen.y}
 
-            // Look at last static position
-            if (lastStaticPosition === undefined) {
-              lastStaticPosition = {x:d_canvas.x, y:d_canvas.y, timestamp:d.timestamp}
-            }
           })
         }
       });
