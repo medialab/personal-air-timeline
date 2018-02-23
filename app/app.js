@@ -468,19 +468,59 @@ config(['$routeProvider', function($routeProvider) {
           
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
           
+          // Background line
+          g.append("line")
+              .attr("x1", 0)
+              .attr("y1", height/2)
+              .attr("x2", width)
+              .attr("y2", height/2)
+              .attr("stroke", "black")
+              .attr("stroke-linejoin", "round")
+              .attr("stroke-linecap", "round")
+              .attr("stroke-width", 1)
+
+          // Black outline
           $scope.places.forEach(function(place){
             place.stays.forEach(function(stay){
               g.append("line")
                   .attr("x1", x(stay.begin))
-                  .attr("y1", 0)
+                  .attr("y1", height/2)
                   .attr("x2", x(stay.end))
-                  .attr("y2", 0)
+                  .attr("y2", height/2)
                   .attr("stroke", "black")
                   .attr("stroke-linejoin", "round")
                   .attr("stroke-linecap", "round")
-                  .attr("stroke-width", 0.5)
+                  .attr("stroke-width", 20)
             })
           })
+          // White
+          $scope.places.forEach(function(place){
+            place.stays.forEach(function(stay){
+              g.append("line")
+                  .attr("x1", x(stay.begin))
+                  .attr("y1", height/2)
+                  .attr("x2", x(stay.end))
+                  .attr("y2", height/2)
+                  .attr("stroke", "white")
+                  .attr("stroke-linejoin", "round")
+                  .attr("stroke-linecap", "round")
+                  .attr("stroke-width", 16.5)
+            })
+          })
+
+          $scope.places.forEach(function(place){
+            place.stays.forEach(function(stay){
+              g.append("text")
+                  .attr('x', (Math.max(0, x(stay.begin)) + Math.min(width, x(stay.end))) / 2)
+                  .attr('y', 6 + height/2)
+                  .text(place.name)
+                  .attr("text-anchor", "middle")
+                  .attr("font-family", "Roboto Slab")
+                  .attr("font-size", "16px")
+                  .attr("fill", "black")
+            })
+          })
+          
 
           /* 
 
