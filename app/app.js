@@ -479,39 +479,40 @@ config(['$routeProvider', function($routeProvider) {
               .attr("stroke-linecap", "round")
               .attr("stroke-width", 1)
 
+          var thickness = 20
           // Black outline
           $scope.places.forEach(function(place){
             place.stays.forEach(function(stay){
               g.append("line")
-                  .attr("x1", x(stay.begin))
+                  .attr("x1", x(stay.begin) + Math.min(x(stay.end) - x(stay.begin), thickness)/2)
                   .attr("y1", height/2)
-                  .attr("x2", x(stay.end))
+                  .attr("x2", x(stay.end) - Math.min(x(stay.end) - x(stay.begin), thickness)/2)
                   .attr("y2", height/2)
                   .attr("stroke", "black")
                   .attr("stroke-linejoin", "round")
                   .attr("stroke-linecap", "round")
-                  .attr("stroke-width", 20)
+                  .attr("stroke-width", thickness)
             })
           })
           // White
           $scope.places.forEach(function(place){
             place.stays.forEach(function(stay){
               g.append("line")
-                  .attr("x1", x(stay.begin))
+                  .attr("x1", x(stay.begin) + Math.min(x(stay.end) - x(stay.begin), thickness)/2)
                   .attr("y1", height/2)
-                  .attr("x2", x(stay.end))
+                  .attr("x2", x(stay.end) - Math.min(x(stay.end) - x(stay.begin), thickness)/2)
                   .attr("y2", height/2)
                   .attr("stroke", "white")
                   .attr("stroke-linejoin", "round")
                   .attr("stroke-linecap", "round")
-                  .attr("stroke-width", 16.5)
+                  .attr("stroke-width", thickness-3.5)
             })
           })
 
           $scope.places.forEach(function(place){
             place.stays.forEach(function(stay){
               g.append("text")
-                  .attr('x', (Math.max(0, x(stay.begin)) + Math.min(width, x(stay.end))) / 2)
+                  .attr('x', (Math.max(-margin.left, x(stay.begin)) + Math.min(width+margin.right, x(stay.end))) / 2)
                   .attr('y', 6 + height/2)
                   .text(place.name)
                   .attr("text-anchor", "middle")
