@@ -370,7 +370,7 @@ config(['$routeProvider', function($routeProvider) {
               .y(function(d) { return y(d[$scope.accessor]); })
 
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
-          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+          y.domain([0, d3.max($scope.timelineData.map(function(d) { return d[$scope.accessor]; }))]);
 
           if ($scope.secondaryAccessor) {
             var line2 = d3.line()
@@ -381,8 +381,8 @@ config(['$routeProvider', function($routeProvider) {
             g.append("path")
                 .datum($scope.timelineData)
                 .attr("fill", "none")
-                .attr("stroke-dasharray", "1, 1")
-                .attr("stroke", "#666")
+                .attr("stroke-dasharray", "0.3, 1.2")
+                .attr("stroke", "#777")
                 .attr("stroke-linejoin", "round")
                 .attr("stroke-linecap", "round")
                 .attr("stroke-width", 0.5)
