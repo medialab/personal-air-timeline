@@ -321,6 +321,7 @@ config(['$routeProvider', function($routeProvider) {
     scope: {
       timelineData: '=',
       accessor: '=',
+      secondaryAccessor: '=',
       title: '='
     },
     link: function($scope, el, attrs) {
@@ -370,6 +371,23 @@ config(['$routeProvider', function($routeProvider) {
 
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
           y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
+
+          if ($scope.secondaryAccessor) {
+            var line2 = d3.line()
+                .defined(function(d) { return y(d[$scope.secondaryAccessor]) && d.def})
+                .x(function(d) { return x(d.timestamp); })
+                .y(function(d) { return y(d[$scope.secondaryAccessor]); })
+
+            g.append("path")
+                .datum($scope.timelineData)
+                .attr("fill", "none")
+                .attr("stroke-dasharray", "1, 1")
+                .attr("stroke", "#666")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 0.5)
+                .attr("d", line2);
+          }
 
           g.append("path")
               .datum($scope.timelineData)
