@@ -10,9 +10,12 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
     },
     link: function($scope, el, attrs) {
       $scope.$watch('data', redraw)
+      
+      var canvas, pos
 
       function redraw(){
         // Reposition the map
+
         var data = $scope.data.filter(function(d) {
           return d.x && d.y;
         });
@@ -40,7 +43,8 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
           [maxY, maxX]
         ]);
 
-        // redrawCanvas($scope.map)
+        // Canvas
+        redrawCanvas()
       }
 
       var div = el.find('div')[0];
@@ -70,7 +74,30 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
       // Custom canvas layer
       Leaflet.CanvasLayer = Leaflet.Layer.extend({
-        onAdd: redrawCanvas
+        onAdd: function(map) {
+          var pane = map.getPane(this.options.pane);
+          canvas = Leaflet.DomUtil.create('canvas');
+          var mapSize = map.getSize();
+
+          var pixelRatio = 4;
+
+          canvas.width = mapSize.x * pixelRatio;
+          canvas.height = mapSize.y * pixelRatio;
+
+          canvas.style.width = mapSize.x + 'px';
+          canvas.style.height = mapSize.y + 'px';
+
+          pane.appendChild(canvas);
+
+          pos = function(point) {
+            var result = map.latLngToLayerPoint([point.y, point.x]);
+            result.x *= pixelRatio
+            result.y *= pixelRatio
+            return result
+          };
+
+          redrawCanvas()
+        }
       });
 
       // Map initialization
@@ -98,29 +125,14 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
         [maxY, maxX]
       ]);
 
-      function redrawCanvas(map) {
-        var pane = map.getPane(this.options.pane);
-        var canvas = Leaflet.DomUtil.create('canvas');
-        var mapSize = map.getSize();
-
-        var pixelRatio = 4;
-
-        canvas.width = mapSize.x * pixelRatio;
-        canvas.height = mapSize.y * pixelRatio;
-
-        canvas.style.width = mapSize.x + 'px';
-        canvas.style.height = mapSize.y + 'px';
-
-        pane.appendChild(canvas);
-
-        var pos = function(point) {
-          var result = map.latLngToLayerPoint([point.y, point.x]);
-          result.x *= pixelRatio
-          result.y *= pixelRatio
-          return result
-        };
-
+      function redrawCanvas() {
+        console.log('Redraw Canvas')
+        var data = $scope.data.filter(function(d) {
+          return d.x && d.y;
+        });
+        
         var ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.lineCap="round"
 
         var lastPosition
