@@ -470,8 +470,6 @@ config(['$routeProvider', function($routeProvider) {
           
           /* 
 
-          y.domain(d3.extent($scope.timelineData, function(d) { return d[$scope.accessor]; }));
-
           g.append("path")
               .datum($scope.timelineData)
               .attr("fill", "none")
