@@ -453,6 +453,7 @@ config(['$routeProvider', function($routeProvider) {
     },
     link: function($scope, el, attrs) {
       $scope.$watch('places', redraw, true)
+      $scope.$watch('timelineData', redraw, true)
       window.addEventListener('resize', redraw)
       $scope.$on('$destroy', function(){
         window.removeEventListener('resize', redraw)
