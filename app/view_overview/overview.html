@@ -13,7 +13,8 @@
 			<h1>Air pollution record</h1>
 		</div>
 		<div flex="50" class="md-padding" layout="column">
-			<bw-curve style="height: 100px;" timeline-data="timelineData" accessor="'smoothedspeed'"  title="'SPEED'"></bw-curve>
+			<bw-curve style="height: 150px;" timeline-data="timelineData" accessor="'smoothedspeed'"  title="'SPEED'"></bw-curve>
+      <bw-curve style="height: 150px;" timeline-data="timelineData" accessor="'PM25'"  title="'PART. MATTER 2.5'"></bw-curve>
 		</div>
 		<div flex="40">
 			<leaflet-canvas data="timelineData" places="shortStaticPositions"></leaflet-canvas>

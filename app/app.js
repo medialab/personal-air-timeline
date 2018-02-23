@@ -337,7 +337,7 @@ config(['$routeProvider', function($routeProvider) {
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 6, right: 6, bottom: 24, left: 6};
+          var margin = {top: 6, right: 6, bottom: 24, left: 60};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
@@ -380,19 +380,24 @@ config(['$routeProvider', function($routeProvider) {
               .attr("stroke-width", 0.5)
               .attr("d", line);
 
-          /*g.append("text")
-              .attr('x', -6)
-              .attr('y', 18)
-              .text($scope.title)
-              .attr("text-anchor", "end")
-              .attr("font-family", "sans-serif")
-              .attr("font-size", "12px")
-              .attr("fill", "black")*/
-
           g.append("g")
               .attr("transform", "translate(0," + height + ")")
               .call(d3.axisBottom(x))
               .attr("class", "bwAxis")
+
+          g.append("g")
+              .call(d3.axisLeft(y))
+              .attr("class", "bwAxis")
+
+          g.append("text")
+              .attr('x', 0)
+              .attr('y', -40)
+              .attr("transform", "rotate(-90)")
+              .text($scope.title)
+              .attr("text-anchor", "end")
+              .attr("font-family", "Roboto Slab")
+              .attr("font-size", "14px")
+              .attr("fill", "black")
         })
       }
     }
