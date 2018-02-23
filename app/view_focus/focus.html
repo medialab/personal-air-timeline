@@ -10,15 +10,15 @@
 <div ng-if="!loading" class="page-container">
 	<div class="a4page" layout="column">
 
-		<div style="height: 50px" layout="column">
-			<places-line style="height: 50px;" timeline-data="timelineData" places="shortStaticPositions"></places-line>
+		<div style="height: 80px; background-color: #CCC;" layout="column">
+      <bw-curve style="height: 30px; opacity:0.6" timeline-data="timelineData" accessor="'PM10'" title="" noscale="true"></bw-curve>
+			<places-line style="height: 50px; opacity:0.6" timeline-data="timelineData" places="shortStaticPositions"></places-line>
 		</div>
 		
-		<div layout-padding style="height: 65px">
-			<h1>{{startDate}} - {{endDate}}</h1>
-		</div>
-		
-		<div flex="50" layout="column">
+		<div layout="column" flex>
+			<div layout="column" layout-align="center center">
+				<h1>{{startDate}} - {{endDate}}</h1>
+			</div>
 			
       <bw-curve style="height: 200px;" timeline-data="filteredTimelineData" accessor="'PM10'" secondary-accessor="'PM25'" title="'PARTICULATE MATTER'"></bw-curve>
 
@@ -28,7 +28,7 @@
 
 		</div>
 
-		<div flex="40">
+		<div style="height: 300px">
 			<leaflet-canvas data="filteredTimelineData" places="shortStaticPositions"></leaflet-canvas>
 		</div>
 

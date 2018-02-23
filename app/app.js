@@ -322,7 +322,8 @@ config(['$routeProvider', function($routeProvider) {
       timelineData: '=',
       accessor: '=',
       secondaryAccessor: '=',
-      title: '='
+      title: '=',
+      noscale: '='
     },
     link: function($scope, el, attrs) {
       $scope.$watch('timelineData', redraw, true)
@@ -338,7 +339,7 @@ config(['$routeProvider', function($routeProvider) {
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 6, right: 6, bottom: 24, left: 60};
+          var margin = {top: 6, right: 0, bottom: $scope.noscale?6:24, left: 60};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
@@ -398,14 +399,16 @@ config(['$routeProvider', function($routeProvider) {
               .attr("stroke-width", 0.5)
               .attr("d", line);
 
-          g.append("g")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(x))
-              .attr("class", "bwAxis")
+          if (!$scope.noscale) {
+            g.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+                .attr("class", "bwAxis")
 
-          g.append("g")
-              .call(d3.axisLeft(y))
-              .attr("class", "bwAxis")
+            g.append("g")
+                .call(d3.axisLeft(y))
+                .attr("class", "bwAxis")
+            }
 
           g.append("text")
               .attr('x', 0)
@@ -444,7 +447,7 @@ config(['$routeProvider', function($routeProvider) {
           container.html('');
 
           // Setup: dimensions
-          var margin = {top: 6, right: 6, bottom: 6, left: 60};
+          var margin = {top: 6, right: 0, bottom: 6, left: 60};
           var width = container[0].offsetWidth - margin.left - margin.right;
           var height = container[0].offsetHeight - margin.top - margin.bottom;
 
