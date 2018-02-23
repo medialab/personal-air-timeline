@@ -78,7 +78,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
             // Rotation jitter
             var angle = (2*Math.PI*d.timestamp/300000)%(2*Math.PI) // One turn every 5 minutes
-            jitter = 8 * Math.pow(d.timestatic/timeForATurn, .65) * Math.sin(2.9 * d.timestatic/timeForATurn + 0.1 * randomDeviation) // Pixels
+            jitter = 5 * Math.pow(d.timestatic/timeForATurn, .65) * Math.sin(2.9 * d.timestatic/timeForATurn + 0.1 * randomDeviation) // Pixels
 
             d_canvas.x += jitter * Math.cos(angle) + 0.2 * randomDeviation
             d_canvas.y += jitter * Math.sin(angle) + 0.2 * randomDeviation2
@@ -95,7 +95,7 @@ angular.module('saveourair.directives.leafletCanvas', []).directive('leafletCanv
 
               // Draw
               ctx.beginPath()
-              ctx.lineWidth = 5 - Math.min(4, d.smoothedspeed / 15)
+              ctx.lineWidth = 4 - Math.min(3, d.smoothedspeed / 15)
               ctx.moveTo(lastPosition.x, lastPosition.y)
               ctx.lineTo(pen.x, pen.y)
               ctx.strokeStyle = 'rgba(0, 0, 0, ' + opacity + ')'
