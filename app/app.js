@@ -23,6 +23,23 @@ require('./view_board/board.js');
 require('./view_overview/overview.js');
 require('./view_focus/focus.js');
 
+// Helpers
+// TODO: we should rely on a proper dep rather than copying this each time
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 // Declare app level module which depends on views, and components
 angular.module('saveourair', [
   'ngRoute',
@@ -161,7 +178,7 @@ config(['$routeProvider', function($routeProvider) {
       place.duration = d3.sum(place.stays, function(stay){ return stay.end - stay.begin })
       place.stays.forEach(function(stay){
         place.begin = Math.min(place.begin || stay.begin, stay.begin)
-        place.end = Math.max(place.end || stay.end, stay.end)        
+        place.end = Math.max(place.end || stay.end, stay.end)
       })
     })
     places.sort(function(a, b){ return a.begin - b.begin })
@@ -468,9 +485,9 @@ config(['$routeProvider', function($routeProvider) {
 
           var x = d3.scaleTime()
               .range([0, width])
-          
+
           x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
-          
+
           // Background line
           g.append("line")
               .attr("x1", 0)
@@ -524,9 +541,9 @@ config(['$routeProvider', function($routeProvider) {
                   .attr("fill", "black")
             })
           })
-          
 
-          /* 
+
+          /*
 
           g.append("path")
               .datum($scope.timelineData)
@@ -561,7 +578,7 @@ config(['$routeProvider', function($routeProvider) {
   }
 })
 
-.directive('overBrush', function($timeout){
+.directive('overBrush', function($timeout, $location, $route){
   return {
     restrict: 'E',
     template: '<div style="position:absolute; top:0; width:170mm; height:80px"></div>',
@@ -601,9 +618,34 @@ config(['$routeProvider', function($routeProvider) {
 
           var parseTime = d3.timeParse("%L")
 
+          var extent = d3.extent($scope.timelineData, function(d) { return d.timestamp; })
+
           var x = d3.scaleTime()
               .range([0, width])
-              .domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+              .domain(extent);
+
+          var brushed = function() {
+            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+            var s = d3.event.selection || x.range();
+            update(s);
+          }
+
+          var update = debounce(function(s) {
+            var startDate = x.invert(s[0])
+            var endDate = x.invert(s[1])
+
+            if (+startDate === extent[0] && +endDate === extent[1])
+              return;
+
+            var startDateString = startDate.toISOString().split(/:\d{2}\./)[0]
+            var endDateString = endDate.toISOString().split(/:\d{2}\./)[0]
+            console.log(startDateString + '/' + endDateString)
+            $timeout(function() {
+              // $route.updateParams({start: startDateString, end: endDateString})
+              $location.url('/focus/' + startDateString + '/' + endDateString)
+            })
+
+          }, 300);
 
           var brush = d3.brushX()
               .extent([[0, 0], [width, height]])
@@ -613,15 +655,6 @@ config(['$routeProvider', function($routeProvider) {
             .attr("class", "brush")
             .call(brush)
             .call(brush.move, x.range());
-
-          function brushed() {
-            if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
-            var s = d3.event.selection || x.range();
-
-            // console.log(s, x.invert(s[0]), x.invert(s[1]))
-          }
-
-
         })
       }
     }
