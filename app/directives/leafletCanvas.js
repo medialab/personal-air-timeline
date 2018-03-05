@@ -11,7 +11,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
     },
     link: function($scope, el, attrs) {
       $scope.$watch('data', redraw)
-      
+
       var canvas, pos
 
       function redraw(){
@@ -48,7 +48,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
 
           // Canvas
           $timeout(redrawCanvas)
-          
+
         }
       }
 
@@ -117,14 +117,14 @@ angular.module('saveourair.directives.leafletCanvas', [])
         scrollWheelZoom: false
       });
 
-      Leaflet.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+      Leaflet.tileLayer('https://api.mapbox.com/styles/v1/mikima/cjdyiowio2v2c2sn31jhs4g9e/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWlraW1hIiwiYSI6IjNvWUMwaUEifQ.Za_-O03W3UdQxZwS3bLxtg', {
         attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo($scope.map);
 
       var canvasLayer = new Leaflet.CanvasLayer();
       canvasLayer.addTo($scope.map);
-    
+
       $scope.map.fitBounds([
         [minY, minX],
         [maxY, maxX]

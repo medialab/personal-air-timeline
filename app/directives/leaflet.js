@@ -43,7 +43,7 @@ angular.module('saveourair.directives.leaflet', []).directive('leaflet', [functi
         [maxY, maxX]
       ]);
 
-      Leaflet.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+      Leaflet.tileLayer('https://api.mapbox.com/styles/v1/mikima/cjdyiowio2v2c2sn31jhs4g9e/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWlraW1hIiwiYSI6IjNvWUMwaUEifQ.Za_-O03W3UdQxZwS3bLxtg', {
         attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo($scope.map);
