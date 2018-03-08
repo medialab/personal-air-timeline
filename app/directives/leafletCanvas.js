@@ -151,6 +151,22 @@ angular.module('saveourair.directives.leafletCanvas', [])
 
           var d_canvas = pos(d)
 
+          // Simple path
+          if (d.def && lastPosition) {
+            ctx.beginPath()
+            ctx.lineWidth = 10
+            ctx.moveTo(lastPosition.x, lastPosition.y)
+            ctx.lineTo(d_canvas.x, d_canvas.y)
+            ctx.strokeStyle = 'rgba(0, 0, 0, 1)'
+            ctx.stroke()
+            ctx.fill()
+          }
+
+          lastPosition = {x:d_canvas.x, y:d_canvas.y}
+
+          /*
+          // Mathieu's pen-like path
+
           // Update random deviation
           randomDeviation  = 0.9 * randomDeviation  + (Math.random() - 0.5)
           randomDeviation2 = 0.9 * randomDeviation2 + (Math.random() - 0.5)
@@ -185,7 +201,10 @@ angular.module('saveourair.directives.leafletCanvas', [])
 
           lastPosition = {x:pen.x, y:pen.y}
 
+          */
+
         })
+
 
         // Draw places
         ctx.lineCap="round"
