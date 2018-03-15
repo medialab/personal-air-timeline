@@ -195,7 +195,7 @@ a:active  {
 
 /* Tune leaflet canvas */
 leaflet-canvas .leaflet-tile-pane .leaflet-layer{
-  opacity: 0.2 !important;
+  opacity: 1 !important;
 }
 leaflet-canvas .leaflet-container{
   background-color: #FFF !important;
