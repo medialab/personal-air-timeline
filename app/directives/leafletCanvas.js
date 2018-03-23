@@ -1,5 +1,8 @@
 var Leaflet = require('leaflet');
 
+
+console.log('leafletCanvas.js')
+
 angular.module('saveourair.directives.leafletCanvas', [])
 .directive('leafletCanvas', ['$timeout', function($timeout) {
   return {
@@ -11,7 +14,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
     },
     link: function($scope, el, attrs) {
       $scope.$watch('data', redraw)
-      
+
       var canvas, pos
 
       function redraw(){
@@ -48,7 +51,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
 
           // Canvas
           $timeout(redrawCanvas)
-          
+
         }
       }
 
@@ -84,7 +87,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
           canvas = Leaflet.DomUtil.create('canvas');
           var mapSize = map.getSize();
 
-          var pixelRatio = 4;
+          var pixelRatio = 2;
 
           canvas.width = mapSize.x * pixelRatio;
           canvas.height = mapSize.y * pixelRatio;
@@ -108,7 +111,7 @@ angular.module('saveourair.directives.leafletCanvas', [])
       // Map initialization
       $scope.map = Leaflet.map(div, {
         center: [56.056695, 9.841720],
-        zoomSnap: 0.8,
+        zoomSnap: 1,
         attributionControl: false,
         zoomControl: false,
         dragging: false,
@@ -117,14 +120,16 @@ angular.module('saveourair.directives.leafletCanvas', [])
         scrollWheelZoom: false
       });
 
-      Leaflet.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+      Leaflet.tileLayer('https://api.mapbox.com/styles/v1/mikima/cjdyiowio2v2c2sn31jhs4g9e/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWlraW1hIiwiYSI6IjNvWUMwaUEifQ.Za_-O03W3UdQxZwS3bLxtg', {
         attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         maxZoom: 18,
+        retina: '@2x',
+        detectRetina: true
       }).addTo($scope.map);
 
       var canvasLayer = new Leaflet.CanvasLayer();
       canvasLayer.addTo($scope.map);
-    
+
       $scope.map.fitBounds([
         [minY, minX],
         [maxY, maxX]
@@ -147,19 +152,26 @@ angular.module('saveourair.directives.leafletCanvas', [])
         var randomDeviation2 = 0
         var pen = {x:undefined, y:undefined}
 
+        //define line colors
+        var color = d3.scaleLinear()
+          .domain([0, 100, 500])
+          .range(["green", "orange", "red"]);
+
         data.forEach(function(d, i){
 
           var d_canvas = pos(d)
 
+          //console.log(d['PM10']);
+
           // Simple path
           if (d.def && lastPosition) {
             ctx.beginPath()
-            ctx.lineWidth = 10
+            ctx.lineWidth = 5
             ctx.moveTo(lastPosition.x, lastPosition.y)
             ctx.lineTo(d_canvas.x, d_canvas.y)
-            ctx.strokeStyle = 'rgba(0, 0, 0, 1)'
+            ctx.strokeStyle = color(d['PM10'])
             ctx.stroke()
-            ctx.fill()
+            //ctx.fill()
           }
 
           lastPosition = {x:d_canvas.x, y:d_canvas.y}
@@ -209,24 +221,58 @@ angular.module('saveourair.directives.leafletCanvas', [])
         // Draw places
         ctx.lineCap="round"
         ctx.lineJoin="round"
-        var yOffset = 25
+        var cradius = 20
+        var fontSize = 30
+
+
+        
         $scope.places.forEach(function(place){
-          var place_canvas = pos(place)
-          ctx.font = "80px Roboto Slab";
+
+          var place_canvas = pos(place);
+          console.log(place);
+          //circle
+          //draw circles
+          ctx.moveTo(place_canvas.x + cradius, place_canvas.y);
+          ctx.beginPath();
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = color(place['max_PM10']);
+          ctx.arc(place_canvas.x, place_canvas.y, cradius, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+          ctx.closePath();
+          //draw letter
+          ctx.beginPath();
+          ctx.font = fontSize + "px Roboto Slab";
           ctx.textAlign = "center";
           ctx.fillStyle = "black";
-          ctx.fillText(place.name, place_canvas.x, place_canvas.y + yOffset);
-          ctx.strokeStyle = "black";
-          ctx.lineWidth = 25;
-          ctx.strokeText(place.name, place_canvas.x, place_canvas.y + yOffset);
+          ctx.textBaseline="middle";
+          ctx.fillText(place.name, place_canvas.x, place_canvas.y);
+          ctx.fill();
+          ctx.closePath();
         })
-        $scope.places.forEach(function(place){
-          var place_canvas = pos(place)
-          ctx.font = "80px Roboto Slab";
-          ctx.textAlign = "center";
-          ctx.fillStyle = "white";
-          ctx.fillText(place.name, place_canvas.x, place_canvas.y + yOffset);
-        })
+
+        // $scope.places.forEach(function(place){
+
+        //   console.log(place);
+
+
+        //   var place_canvas = pos(place)
+        //   ctx.beginPath();
+        //   ctx.font = fontSize + "px Roboto Slab";
+        //   ctx.textAlign = "center";
+        //   ctx.fillStyle = "black";
+        //   ctx.fill();
+        //   ctx.fillText(place.name, place_canvas.x, place_canvas.y + fontSize/2);
+        //   ctx.closePath();
+        // })
+
+        // $scope.places.forEach(function(place){
+        //   var place_canvas = pos(place)
+        //   ctx.font = "80px Roboto Slab";
+        //   ctx.textAlign = "center";
+        //   ctx.fillStyle = "white";
+        //   ctx.fillText(place.name, place_canvas.x, place_canvas.y + yOffset);
+        // })
       }
 
     }

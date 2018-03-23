@@ -108,10 +108,10 @@ angular.module('saveourair.view_focus', ['ngRoute'])
     //
     function titleFormatDate(date) {
       var monthNames = [
-        "Jan", "Feb", "March",
-        "April", "May", "June", "July",
-        "Aug", "Sept", "Oct",
-        "Nov", "Dec"
+        "Jan", "Feb", "Mar",
+        "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", 
+        "Oct", "Nov", "Dec"
       ];
 
       var day = date.getDate();
