@@ -140,15 +140,19 @@ config(['$routeProvider', function($routeProvider) {
 
   ns.staticPositions = function(data) {
     // Compute when ego stayed at the same place for a time
+    //console.log(data);
     var stays = []
     var currentStaticPosition
     var staticThreshold = 10 * 60 * 1000 // Ten minutes to stay at the same place
     data.forEach(function(d){
+
       if (d.timestatic > staticThreshold && d.x && d.y) {
         if (currentStaticPosition == undefined) {
-          currentStaticPosition = {x:d.x, y:d.y, begin:d.timestamp, end:d.timestamp}
+          currentStaticPosition = {PM10:[], x:d.x, y:d.y, begin:d.timestamp, end:d.timestamp};
+          currentStaticPosition['PM10'].push(d.PM10);
         } else {
-          currentStaticPosition.end = d.timestamp
+          currentStaticPosition.end = d.timestamp;
+          currentStaticPosition['PM10'].push(d.PM10);
         }
       } else {
         if (currentStaticPosition) {
@@ -180,6 +184,8 @@ config(['$routeProvider', function($routeProvider) {
       place.stays.forEach(function(stay){
         place.begin = Math.min(place.begin || stay.begin, stay.begin)
         place.end = Math.max(place.end || stay.end, stay.end)
+        place.PM10 = stay.PM10
+        place.max_PM10 = d3.max(stay.PM10);
       })
     })
     places.sort(function(a, b){ return a.begin - b.begin })
@@ -188,6 +194,8 @@ config(['$routeProvider', function($routeProvider) {
       place.name = alphabet[i%alphabet.length]
     })
     places.sort(function(a, b){ return b.duration - a.duration })
+
+    //console.log(places);
 
     return places
   }
@@ -412,6 +420,134 @@ config(['$routeProvider', function($routeProvider) {
               .datum($scope.timelineData)
               .attr("fill", "none")
               .attr("stroke", "black")
+              .attr("stroke-linejoin", "round")
+              .attr("stroke-linecap", "round")
+              .attr("stroke-width", 0.5)
+              .attr("d", line);
+
+          if (!$scope.noscale) {
+            g.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+                .attr("class", "bwAxis")
+
+            g.append("g")
+                .call(d3.axisLeft(y))
+                .attr("class", "bwAxis")
+            }
+
+          g.append("text")
+              .attr('x', 0)
+              .attr('y', -40)
+              .attr("transform", "rotate(-90)")
+              .text($scope.title)
+              .attr("text-anchor", "end")
+              .attr("font-family", "Roboto Slab")
+              .attr("font-size", "14px")
+              .attr("fill", "black")
+        })
+      }
+    }
+  }
+})
+
+.directive('colorCurve', function($timeout){
+  return {
+    restrict: 'E',
+    template: '<small style="opacity:0.5;">{{title}} loading...</small>',
+    scope: {
+      timelineData: '=',
+      accessor: '=',
+      secondaryAccessor: '=',
+      title: '=',
+      noscale: '='
+    },
+    link: function($scope, el, attrs) {
+      $scope.$watch('timelineData', redraw, true)
+      window.addEventListener('resize', redraw)
+      $scope.$on('$destroy', function(){
+        window.removeEventListener('resize', redraw)
+      })
+
+      var container = el
+
+      function redraw(){
+        $timeout(function(){
+          container.html('');
+
+          // Setup: dimensions
+          var margin = {top: 6, right: 0, bottom: $scope.noscale?6:24, left: 60};
+          var width = container[0].offsetWidth - margin.left - margin.right;
+          var height = container[0].offsetHeight - margin.top - margin.bottom;
+
+          // // While loading redraw may trigger before element being properly sized
+          if (width <= 0 || height <= 0) {
+            $timeout(redraw, 250)
+            return
+          }
+
+          var svg = d3.select(container[0])
+            .append('svg')
+            .attr('width', container[0].offsetWidth)
+            .attr('height', container[0].offsetHeight)
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+          var parseTime = d3.timeParse("%L")
+
+          var x = d3.scaleTime()
+              .range([0, width])
+
+          // Only display the data
+          var y = d3.scaleLinear()
+              .range([height, 0])
+
+          var line = d3.line()
+              .defined(function(d) { return y(d[$scope.accessor]) && d.def})
+              .x(function(d) { return x(d.timestamp); })
+              .y(function(d) { return y(d[$scope.accessor]); })
+
+          x.domain(d3.extent($scope.timelineData, function(d) { return d.timestamp; }));
+          y.domain([0, d3.max($scope.timelineData.map(function(d) { return d[$scope.accessor]; }))]);
+
+          if ($scope.secondaryAccessor) {
+            var line2 = d3.line()
+                .defined(function(d) { return y(d[$scope.secondaryAccessor]) && d.def})
+                .x(function(d) { return x(d.timestamp); })
+                .y(function(d) { return y(d[$scope.secondaryAccessor]); })
+
+            g.append("path")
+                .datum($scope.timelineData)
+                .attr("fill", "none")
+                .attr("stroke-dasharray", "0.3, 1.2")
+                .attr("stroke", "#777")
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr("stroke-width", 0.5)
+                .attr("d", line2);
+          }
+
+          //create the gradient
+          // set the gradient
+          svg.append("linearGradient")
+            .attr("id", "line-gradient")
+            .attr("gradientUnits", "userSpaceOnUse")
+            .attr("x1", 0).attr("y1", y(0))
+            .attr("x2", 0).attr("y2", y(height))
+          .selectAll("stop")
+            .data([
+              {offset: "0%", color: "green"},   
+              {offset: "50%", color: "orange"},  
+              {offset: "100%", color: "red"}
+            ])
+          .enter().append("stop")
+            .attr("offset", function(d) { return d.offset; }) 
+            .attr("stop-color", function(d) { return d.color; });
+
+          g.append("path")
+              .datum($scope.timelineData)
+              .attr("fill", "none")
+              .attr("stroke", 'url(#line-gradient)')
               .attr("stroke-linejoin", "round")
               .attr("stroke-linecap", "round")
               .attr("stroke-width", 0.5)

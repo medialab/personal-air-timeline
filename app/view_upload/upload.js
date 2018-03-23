@@ -43,6 +43,15 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
   $scope.offset
 
+  // TODO: watch offset for reconciling
+  $scope.$watch('offset', function(){
+    if ($scope.reconciledData) {
+      $scope.reconciledData = undefined
+      finalizeReconciling()
+    }
+  })
+
+
   // Load pm files
   d3.text('./data/quad-tree-pm10.csv', function(data){
     var lines = d3.csvParseRows(data);
@@ -94,7 +103,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     })
   }
 
-  finalizeReconciling = debounce(finalizeReconciling, 500);
+  finalizeReconciling = debounce(finalizeReconciling, 750);
 
   $scope.download = function() {
     var blob = new Blob([d3.csvFormat($scope.reconciledData)], {'type':'text/csv;charset=utf-8'});
@@ -108,8 +117,11 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.setSensorFile = function(element) {
-    var file = element.files[0]
-    $scope.readSensorFile(file)
+    var i
+    for (i=0; i< element.files.length; i++){
+      var file = element.files[i]
+      $scope.readSensorFile(file)
+    }
   }
 
   $scope.readSensorFile = function(file){
@@ -173,8 +185,11 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.setTimelineFile = function(element) {
-    var file = element.files[0]
-    $scope.readTimelineFile(file)
+    var i
+    for (i=0; i< element.files.length; i++){
+      var file = element.files[i]
+      $scope.readTimelineFile(file)
+    }
   }
 
   $scope.readTimelineFile = function(file){
