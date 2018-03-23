@@ -43,6 +43,15 @@ angular.module('saveourair.view_upload', ['ngRoute'])
 
   $scope.offset
 
+  // TODO: watch offset for reconciling
+  $scope.$watch('offset', function(){
+    if ($scope.reconciledData) {
+      $scope.reconciledData = undefined
+      finalizeReconciling()
+    }
+  })
+
+
   // Load pm files
   d3.text('./data/quad-tree-pm10.csv', function(data){
     var lines = d3.csvParseRows(data);
@@ -94,7 +103,7 @@ angular.module('saveourair.view_upload', ['ngRoute'])
     })
   }
 
-  finalizeReconciling = debounce(finalizeReconciling, 500);
+  finalizeReconciling = debounce(finalizeReconciling, 750);
 
   $scope.download = function() {
     var blob = new Blob([d3.csvFormat($scope.reconciledData)], {'type':'text/csv;charset=utf-8'});
