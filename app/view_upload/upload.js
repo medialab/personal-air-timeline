@@ -117,8 +117,11 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.setSensorFile = function(element) {
-    var file = element.files[0]
-    $scope.readSensorFile(file)
+    var i
+    for (i=0; i< element.files.length; i++){
+      var file = element.files[i]
+      $scope.readSensorFile(file)
+    }
   }
 
   $scope.readSensorFile = function(file){
@@ -182,8 +185,11 @@ angular.module('saveourair.view_upload', ['ngRoute'])
   }
 
   $scope.setTimelineFile = function(element) {
-    var file = element.files[0]
-    $scope.readTimelineFile(file)
+    var i
+    for (i=0; i< element.files.length; i++){
+      var file = element.files[i]
+      $scope.readTimelineFile(file)
+    }
   }
 
   $scope.readTimelineFile = function(file){
